@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Tradeya is a platform for trading skills and services to build community and grow together.">
+  <meta name="keywords" content="skills, trade, community, networking, collaboration">
+  <meta property="og:title" content="Tradeya: Trade Skills. Build Community. Grow Together.">
+  <meta property="og:description" content="Tradeya allows members to trade their skills and services with each other. Join now to start collaborating!">
+  <title>Tradeya: Skills Exchange</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <h1>Tradeya</h1>
+      <p>Trade Skills. Build Community. Grow Together.</p>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="#dashboard">Dashboard</a></li>
+        <li><a href="#team-section">Team</a></li>
+        <li><a href="#calendar">Calendar</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Dashboard Section -->
+    <section id="dashboard">
+      <h2>Welcome, [User Name]</h2>
+      <div class="dashboard-grid">
+        <div class="task-tracking">
+          <h3>Current Trades</h3>
+          <ul id="current-trades">
+            <li>No active trades. Start collaborating now!</li>
+          </ul>
+        </div>
+        <div class="recommendations">
+          <h3>Recommended Connections</h3>
+          <ul id="recommendations">
+            <li>Find people based on your needs and skills!</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team-section">
+      <h2>Team Members</h2>
+      <div class="search-bar">
+        <input type="text" id="search-bar" placeholder="Search by skill or need">
+        <button onclick="searchUsers()">Search</button>
+      </div>
+      <div id="team-table-container">
+        <table id="team-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Skills</th>
+              <th>Needs</th>
+              <th>Portfolio</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="team-list">
+            <!-- Table Rows Generated Dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Calendar Section -->
+    <section id="calendar">
+      <h2>Shared Calendar</h2>
+      <div id="calendar-container"></div>
+    </section>
+
+    <!-- Modals -->
+    <div id="profile-modal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close-btn" onclick="toggleModal('profile-modal')">&times;</span>
+        <h2>Edit Profile</h2>
+        <form id="profile-form">
+          <label for="name">Name:</label>
+          <input type="text" id="name" placeholder="Enter your name">
+          <label for="skills">Skills:</label>
+          <textarea id="skills" placeholder="List your skills"></textarea>
+          <label for="needs">Needs:</label>
+          <textarea id="needs" placeholder="List your needs"></textarea>
+          <button type="submit">Save</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2025 Tradeya. All rights reserved.</p>
+    <div class="social-media">
+      <a href="https://facebook.com" target="_blank">Facebook</a>
+      <a href="https://twitter.com" target="_blank">Twitter</a>
+      <a href="https://instagram.com" target="_blank">Instagram</a>
+    </div>
+  </footer>
+
+  <script>
+    // Member Data (Dynamic Addition)
+    const teamMembers = [
+      { name: "Adrian", skills: "Logistics, Performing Music", needs: "Promotion, Event Coordination", portfolio: "#" },
+      { name: "Izzy", skills: "Clothing Brand, Merch", needs: "Graphic Design", portfolio: "#" },
+      { name: "TLOK", skills: "Engineering, Producing, Audio Edit", needs: "Mixing Mastering", portfolio: "#" },
+      { name: "RJ", skills: "Setup, House Engineer, DJ", needs: "Event Planning", portfolio: "#" },
+      { name: "Johnny Maconny", skills: "Audio Engineering, Podcast Editing", needs: "Web Development", portfolio: "#" },
+      { name: "Benny", skills: "Filming, Editing, Radio Connections", needs: "Collaborative Projects", portfolio: "#" },
+      { name: "Jaylon", skills: "Beatmaking, Admin, Promo", needs: "Marketing Assistance", portfolio: "#" },
+      { name: "Greg", skills: "Music Production, Instrumentalist", needs: "Studio Space", portfolio: "#" },
+      { name: "Juan", skills: "Accounting, Brand Development", needs: "Music Marketing", portfolio: "#" },
+      { name: "Mike", skills: "Songwriting, Vlog Editing", needs: "Distribution Channels", portfolio: "#" },
+      { name: "Thalita", skills: "Styling, Marketing Strategy", needs: "Portfolio Shoots", portfolio: "#" }
+    ];
+
+    const teamList = document.getElementById("team-list");
+
+    function populateTeamTable() {
+      teamMembers.forEach(member => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${member.name}</td>
+          <td>${member.skills}</td>
+          <td>${member.needs}</td>
+          <td><a href="${member.portfolio}" target="_blank">View Portfolio</a></td>
+          <td><button onclick="contactMember('${member.name}')">Contact</button></td>
+        `;
+        teamList.appendChild(row);
+      });
+    }
+
+    function contactMember(name) {
+      alert(`Contacting ${name}`);
+    }
+
+    function searchUsers() {
+      const query = document.getElementById("search-bar").value.toLowerCase();
+      const filteredMembers = teamMembers.filter(member =>
+        member.skills.toLowerCase().includes(query) ||
+        member.needs.toLowerCase().includes(query) ||
+        member.name.toLowerCase().includes(query)
+      );
+
+      teamList.innerHTML = "";
+      filteredMembers.forEach(member => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${member.name}</td>
+          <td>${member.skills}</td>
+          <td>${member.needs}</td>
+          <td><a href="${member.portfolio}" target="_blank">View Portfolio</a></td>
+          <td><button onclick="contactMember('${member.name}')">Contact</button></td>
+        `;
+        teamList.appendChild(row);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", populateTeamTable);
+  </script>
+</body>
+</html>
