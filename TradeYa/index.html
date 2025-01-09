@@ -21,7 +21,7 @@
       <ul>
         <li><a href="#dashboard">Dashboard</a></li>
         <li><a href="#team-section">Team</a></li>
-        <li><a href="#calendar">Calendar</a></li>
+        <li><a href="#task-section">Tasks</a></li>
       </ul>
     </nav>
   </header>
@@ -31,18 +31,7 @@
     <section id="dashboard">
       <h2>Welcome, [User Name]</h2>
       <div class="dashboard-grid">
-        <div class="task-tracking">
-          <h3>Current Trades</h3>
-          <ul id="current-trades">
-            <li>No active trades. Start collaborating now!</li>
-          </ul>
-        </div>
-        <div class="recommendations">
-          <h3>Recommended Connections</h3>
-          <ul id="recommendations">
-            <li>Find people based on your needs and skills!</li>
-          </ul>
-        </div>
+        <!-- Dashboard Content -->
       </div>
     </section>
 
@@ -53,22 +42,45 @@
         <input type="text" id="search-bar" placeholder="Search by skill or need">
         <button onclick="searchUsers()">Search</button>
       </div>
-      <div id="team-table-container">
-        <table id="team-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Skills</th>
-              <th>Needs</th>
-              <th>Portfolio</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="team-list">
-            <!-- Table Rows Generated Dynamically -->
-          </tbody>
-        </table>
-      </div>
+      <table id="team-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Skills</th>
+            <th>Needs</th>
+            <th>Portfolio</th>
+            <th>Contact</th>
+          </tr>
+        </thead>
+        <tbody id="team-list">
+          <!-- Table Rows Generated Dynamically -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Add Member Section -->
+    <section id="add-member">
+      <h2>Add New Member</h2>
+      <form id="add-member-form">
+        <input type="text" id="new-name" placeholder="Enter name" required>
+        <input type="text" id="new-skills" placeholder="Enter skills (comma separated)" required>
+        <input type="text" id="new-needs" placeholder="Enter needs (comma separated)" required>
+        <input type="text" id="new-portfolio" placeholder="Enter portfolio link" required>
+        <button type="submit">Add Member</button>
+      </form>
+    </section>
+
+    <!-- Task Section -->
+    <section id="task-section">
+      <h2>Task Requests</h2>
+      <form id="add-task-form">
+        <input type="text" id="task-title" placeholder="Enter task title" required>
+        <textarea id="task-description" placeholder="Enter task description" required></textarea>
+        <button type="submit">Add Task</button>
+      </form>
+      <ul id="task-list">
+        <!-- Task Items Generated Dynamically -->
+      </ul>
     </section>
 
     <!-- Calendar Section -->
@@ -80,17 +92,7 @@
     <!-- Modals -->
     <div id="profile-modal" class="modal hidden">
       <div class="modal-content">
-        <span class="close-btn" onclick="toggleModal('profile-modal')">&times;</span>
-        <h2>Edit Profile</h2>
-        <form id="profile-form">
-          <label for="name">Name:</label>
-          <input type="text" id="name" placeholder="Enter your name">
-          <label for="skills">Skills:</label>
-          <textarea id="skills" placeholder="List your skills"></textarea>
-          <label for="needs">Needs:</label>
-          <textarea id="needs" placeholder="List your needs"></textarea>
-          <button type="submit">Save</button>
-        </form>
+        <!-- Modal Content -->
       </div>
     </div>
   </main>
@@ -103,66 +105,5 @@
       <a href="https://instagram.com" target="_blank">Instagram</a>
     </div>
   </footer>
-
-  <script>
-    // Member Data (Dynamic Addition)
-    const teamMembers = [
-      { name: "Adrian", skills: "Logistics, Performing Music", needs: "Promotion, Event Coordination", portfolio: "#" },
-      { name: "Izzy", skills: "Clothing Brand, Merch", needs: "Graphic Design", portfolio: "#" },
-      { name: "TLOK", skills: "Engineering, Producing, Audio Edit", needs: "Mixing Mastering", portfolio: "#" },
-      { name: "RJ", skills: "Setup, House Engineer, DJ", needs: "Event Planning", portfolio: "#" },
-      { name: "Johnny Maconny", skills: "Audio Engineering, Podcast Editing", needs: "Web Development", portfolio: "#" },
-      { name: "Benny", skills: "Filming, Editing, Radio Connections", needs: "Collaborative Projects", portfolio: "#" },
-      { name: "Jaylon", skills: "Beatmaking, Admin, Promo", needs: "Marketing Assistance", portfolio: "#" },
-      { name: "Greg", skills: "Music Production, Instrumentalist", needs: "Studio Space", portfolio: "#" },
-      { name: "Juan", skills: "Accounting, Brand Development", needs: "Music Marketing", portfolio: "#" },
-      { name: "Mike", skills: "Songwriting, Vlog Editing", needs: "Distribution Channels", portfolio: "#" },
-      { name: "Thalita", skills: "Styling, Marketing Strategy", needs: "Portfolio Shoots", portfolio: "#" }
-    ];
-
-    const teamList = document.getElementById("team-list");
-
-    function populateTeamTable() {
-      teamMembers.forEach(member => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${member.name}</td>
-          <td>${member.skills}</td>
-          <td>${member.needs}</td>
-          <td><a href="${member.portfolio}" target="_blank">View Portfolio</a></td>
-          <td><button onclick="contactMember('${member.name}')">Contact</button></td>
-        `;
-        teamList.appendChild(row);
-      });
-    }
-
-    function contactMember(name) {
-      alert(`Contacting ${name}`);
-    }
-
-    function searchUsers() {
-      const query = document.getElementById("search-bar").value.toLowerCase();
-      const filteredMembers = teamMembers.filter(member =>
-        member.skills.toLowerCase().includes(query) ||
-        member.needs.toLowerCase().includes(query) ||
-        member.name.toLowerCase().includes(query)
-      );
-
-      teamList.innerHTML = "";
-      filteredMembers.forEach(member => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${member.name}</td>
-          <td>${member.skills}</td>
-          <td>${member.needs}</td>
-          <td><a href="${member.portfolio}" target="_blank">View Portfolio</a></td>
-          <td><button onclick="contactMember('${member.name}')">Contact</button></td>
-        `;
-        teamList.appendChild(row);
-      });
-    }
-
-    document.addEventListener("DOMContentLoaded", populateTeamTable);
-  </script>
 </body>
 </html>
