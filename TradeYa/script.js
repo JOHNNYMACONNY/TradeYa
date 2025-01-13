@@ -1,5 +1,5 @@
-// Member Data (Dynamic Addition)
-const teamMembers = [
+// Load data from local storage or use default data
+const teamMembers = JSON.parse(localStorage.getItem('teamMembers')) || [
     { name: "Adrian", skills: "Logistics, Performing Music", needs: "Promotion, Event Coordination", portfolio: "#", contact: "adrian@example.com" },
     { name: "Izzy", skills: "Clothing Brand, Merch", needs: "Graphic Design", portfolio: "#", contact: "izzy@example.com" },
     { name: "TLOK", skills: "Engineering, Producing, Audio Edit", needs: "Mixing Mastering", portfolio: "#", contact: "tlok@example.com" },
@@ -13,7 +13,18 @@ const teamMembers = [
     { name: "Thalita", skills: "Styling, Marketing Strategy", needs: "Portfolio Shoots", portfolio: "#", contact: "thalita@example.com" }
 ];
 
+const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+const collabProjects = JSON.parse(localStorage.getItem('collabProjects')) || [];
+
 const teamList = document.getElementById("team-list");
+const taskList = document.getElementById("task-list");
+const collabList = document.getElementById("collab-list");
+
+function saveToLocalStorage() {
+    localStorage.setItem('teamMembers', JSON.stringify(teamMembers));
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    localStorage.setItem('collabProjects', JSON.stringify(collabProjects));
+}
 
 function populateTeamTable() {
     teamList.innerHTML = ""; // Clear existing rows
@@ -66,11 +77,13 @@ function saveMember(index) {
     }
     row.cells[5].querySelector('button[onclick^="editMember"]').style.display = "inline";
     row.cells[5].querySelector('button[onclick^="saveMember"]').style.display = "none";
+    saveToLocalStorage();
 }
 
 function deleteMember(index) {
     teamMembers.splice(index, 1);
     populateTeamTable();
+    saveToLocalStorage();
 }
 
 function addMember() {
@@ -82,6 +95,7 @@ function addMember() {
 
     teamMembers.push({ name, skills, needs, portfolio, contact });
     populateTeamTable();
+    saveToLocalStorage();
 }
 
 function searchUsers() {
@@ -120,7 +134,6 @@ document.getElementById('add-member-form').addEventListener('submit', (e) => {
 });
 
 // Task Management
-const taskList = document.getElementById("task-list");
 
 function populateTaskList() {
     taskList.innerHTML = ""; // Clear existing tasks
@@ -148,6 +161,7 @@ function addTask() {
 
     tasks.push({ title, description, requester, contact, completed: false });
     populateTaskList();
+    saveToLocalStorage();
 }
 
 function editTask(index) {
@@ -171,17 +185,19 @@ function saveTask(index) {
     taskItem.querySelector('p').contentEditable = "false";
     taskItem.querySelector('button[onclick^="editTask"]').style.display = "inline";
     taskItem.querySelector('button[onclick^="saveTask"]').style.display = "none";
-    populateTaskList();
+    saveToLocalStorage();
 }
 
 function markTaskCompleted(index) {
     tasks[index].completed = true;
     populateTaskList();
+    saveToLocalStorage();
 }
 
 function deleteTask(index) {
     tasks.splice(index, 1);
     populateTaskList();
+    saveToLocalStorage();
 }
 
 document.getElementById('add-task-form').addEventListener('submit', (e) => {
@@ -189,10 +205,7 @@ document.getElementById('add-task-form').addEventListener('submit', (e) => {
     addTask();
 });
 
-const tasks = [];
-
 // Collab Projects Management
-const collabList = document.getElementById("collab-list");
 
 function populateCollabList() {
     collabList.innerHTML = ""; // Clear existing projects
@@ -233,6 +246,7 @@ function addCollab() {
 
     collabProjects.push({ title, description, positions, steps: [], progress: 0 });
     populateCollabList();
+    saveToLocalStorage();
 }
 
 function editCollab(index) {
@@ -255,18 +269,20 @@ function saveCollab(index) {
     projectItem.querySelector('p').contentEditable = "false";
     projectItem.querySelector('button[onclick^="editCollab"]').style.display = "inline";
     projectItem.querySelector('button[onclick^="saveCollab"]').style.display = "none";
-    populateCollabList();
+    saveToLocalStorage();
 }
 
 function deleteCollab(index) {
     collabProjects.splice(index, 1);
     populateCollabList();
+    saveToLocalStorage();
 }
 
 function toggleStep(projectIndex, stepIndex) {
     collabProjects[projectIndex].steps[stepIndex].completed = !collabProjects[projectIndex].steps[stepIndex].completed;
     updateProgress(projectIndex);
     populateCollabList();
+    saveToLocalStorage();
 }
 
 function updateProgress(projectIndex) {
@@ -280,6 +296,7 @@ function signUpForPosition(projectIndex, positionIndex) {
     if (memberName) {
         collabProjects[projectIndex].positions[positionIndex].member = memberName;
         populateCollabList();
+        saveToLocalStorage();
     }
 }
 
@@ -300,12 +317,11 @@ function savePosition(projectIndex, positionIndex) {
     positionSpan.contentEditable = "false";
     projectItem.querySelectorAll('button[onclick^="editPosition"]')[positionIndex].style.display = "inline";
     projectItem.querySelectorAll('button[onclick^="savePosition"]')[positionIndex].style.display = "none";
-    populateCollabList();
+    saveToLocalStorage();
 }
 
-document.getElementById('add-collab-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    addCollab();
+document.addEventListener("DOMContentLoaded", () => {
+    populateTeamTable();
+    populateTaskList();
+    populateCollabList();
 });
-
-const collabProjects = [];
