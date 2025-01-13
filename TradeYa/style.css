@@ -101,3 +101,45 @@ li {
     width: 0;
     transition: width 0.5s;
 }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    table, th, td {
+        display: block;
+        width: 100%;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: right;
+    }
+
+    th {
+        background-color: #f2f2f2;
+        text-align: left;
+    }
+
+    td {
+        border: none;
+        border-bottom: 1px solid #ddd;
+    }
+
+    td:before {
+        content: attr(data-label);
+        float: left;
+        font-weight: bold;
+    }
+
+    input[type="text"], input[type="email"] {
+        width: 100%;
+    }
+
+    button {
+        width: 100%;
+        padding: 15px;
+    }
+}
