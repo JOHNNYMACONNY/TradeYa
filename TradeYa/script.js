@@ -1,16 +1,16 @@
 // Member Data (Dynamic Addition)
 const teamMembers = [
-    { name: "Adrian", skills: "Logistics, Performing Music", needs: "Promotion, Event Coordination", portfolio: "#" },
-    { name: "Izzy", skills: "Clothing Brand, Merch", needs: "Graphic Design", portfolio: "#" },
-    { name: "TLOK", skills: "Engineering, Producing, Audio Edit", needs: "Mixing Mastering", portfolio: "#" },
-    { name: "RJ", skills: "Setup, House Engineer, DJ", needs: "Event Planning", portfolio: "#" },
-    { name: "Johnny Maconny", skills: "Audio Engineering, Podcast Editing", needs: "Web Development", portfolio: "#" },
-    { name: "Benny", skills: "Filming, Editing, Radio Connections", needs: "Collaborative Projects", portfolio: "#" },
-    { name: "Jaylon", skills: "Beatmaking, Admin, Promo", needs: "Marketing Assistance", portfolio: "#" },
-    { name: "Greg", skills: "Music Production, Instrumentalist", needs: "Studio Space", portfolio: "#" },
-    { name: "Juan", skills: "Accounting, Brand Development", needs: "Music Marketing", portfolio: "#" },
-    { name: "Mike", skills: "Songwriting, Vlog Editing", needs: "Distribution Channels", portfolio: "#" },
-    { name: "Thalita", skills: "Styling, Marketing Strategy", needs: "Portfolio Shoots", portfolio: "#" }
+    { name: "Adrian", skills: "Logistics, Performing Music", needs: "Promotion, Event Coordination", portfolio: "#", contact: "adrian@example.com" },
+    { name: "Izzy", skills: "Clothing Brand, Merch", needs: "Graphic Design", portfolio: "#", contact: "izzy@example.com" },
+    { name: "TLOK", skills: "Engineering, Producing, Audio Edit", needs: "Mixing Mastering", portfolio: "#", contact: "tlok@example.com" },
+    { name: "RJ", skills: "Setup, House Engineer, DJ", needs: "Event Planning", portfolio: "#", contact: "rj@example.com" },
+    { name: "Johnny Maconny", skills: "Audio Engineering, Podcast Editing", needs: "Web Development", portfolio: "#", contact: "johnny@example.com" },
+    { name: "Benny", skills: "Filming, Editing, Radio Connections", needs: "Collaborative Projects", portfolio: "#", contact: "benny@example.com" },
+    { name: "Jaylon", skills: "Beatmaking, Admin, Promo", needs: "Marketing Assistance", portfolio: "#", contact: "jaylon@example.com" },
+    { name: "Greg", skills: "Music Production, Instrumentalist", needs: "Studio Space", portfolio: "#", contact: "greg@example.com" },
+    { name: "Juan", skills: "Accounting, Brand Development", needs: "Music Marketing", portfolio: "#", contact: "juan@example.com" },
+    { name: "Mike", skills: "Songwriting, Vlog Editing", needs: "Distribution Channels", portfolio: "#", contact: "mike@example.com" },
+    { name: "Thalita", skills: "Styling, Marketing Strategy", needs: "Portfolio Shoots", portfolio: "#", contact: "thalita@example.com" }
 ];
 
 const teamList = document.getElementById("team-list");
@@ -20,13 +20,15 @@ function populateTeamTable() {
     teamMembers.forEach((member, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td contenteditable="true">${member.name}</td>
-            <td contenteditable="true">${member.skills}</td>
-            <td contenteditable="true">${member.needs}</td>
-            <td contenteditable="true"><a href="${member.portfolio}" target="_blank">View Portfolio</a></td>
+            <td contenteditable="false">${member.name}</td>
+            <td contenteditable="false">${member.skills}</td>
+            <td contenteditable="false">${member.needs}</td>
+            <td contenteditable="false"><a href="${member.portfolio}" target="_blank">${member.portfolio}</a></td>
+            <td contenteditable="false">${member.contact}</td>
             <td>
-                <button onclick="contactMember('${member.name}')">Contact</button>
+                <button onclick="contactMember('${member.contact}')">Contact</button>
                 <button onclick="editMember(${index})">Edit</button>
+                <button onclick="saveMember(${index})" style="display:none;">Save</button>
                 <button onclick="deleteMember(${index})">Delete</button>
             </td>
         `;
@@ -34,19 +36,36 @@ function populateTeamTable() {
     });
 }
 
-function contactMember(name) {
-    alert(`Contacting ${name}`);
+function contactMember(contact) {
+    const subject = encodeURIComponent("Collaboration Opportunity");
+    const body = encodeURIComponent("Hi, I would like to discuss a potential collaboration with you.");
+    window.location.href = `mailto:${contact}?subject=${subject}&body=${body}`;
 }
 
 function editMember(index) {
     const row = teamList.rows[index];
+    for (let i = 0; i < 5; i++) {
+        row.cells[i].contentEditable = "true";
+    }
+    row.cells[5].querySelector('button[onclick^="editMember"]').style.display = "none";
+    row.cells[5].querySelector('button[onclick^="saveMember"]').style.display = "inline";
+}
+
+function saveMember(index) {
+    const row = teamList.rows[index];
     const name = row.cells[0].innerText;
     const skills = row.cells[1].innerText;
     const needs = row.cells[2].innerText;
-    const portfolio = row.cells[3].innerText;
+    const portfolio = row.cells[3].querySelector('a').innerText;
+    const contact = row.cells[4].innerText;
 
-    teamMembers[index] = { name, skills, needs, portfolio };
-    populateTeamTable();
+    teamMembers[index] = { name, skills, needs, portfolio, contact };
+
+    for (let i = 0; i < 5; i++) {
+        row.cells[i].contentEditable = "false";
+    }
+    row.cells[5].querySelector('button[onclick^="editMember"]').style.display = "inline";
+    row.cells[5].querySelector('button[onclick^="saveMember"]').style.display = "none";
 }
 
 function deleteMember(index) {
@@ -59,8 +78,9 @@ function addMember() {
     const skills = document.getElementById('new-skills').value;
     const needs = document.getElementById('new-needs').value;
     const portfolio = document.getElementById('new-portfolio').value;
+    const contact = document.getElementById('new-contact').value;
 
-    teamMembers.push({ name, skills, needs, portfolio });
+    teamMembers.push({ name, skills, needs, portfolio, contact });
     populateTeamTable();
 }
 
@@ -76,13 +96,15 @@ function searchUsers() {
     filteredMembers.forEach((member, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td contenteditable="true">${member.name}</td>
-            <td contenteditable="true">${member.skills}</td>
-            <td contenteditable="true">${member.needs}</td>
-            <td contenteditable="true"><a href="${member.portfolio}" target="_blank">View Portfolio</a></td>
+            <td contenteditable="false">${member.name}</td>
+            <td contenteditable="false">${member.skills}</td>
+            <td contenteditable="false">${member.needs}</td>
+            <td contenteditable="false"><a href="${member.portfolio}" target="_blank">${member.portfolio}</a></td>
+            <td contenteditable="false">${member.contact}</td>
             <td>
-                <button onclick="contactMember('${member.name}')">Contact</button>
+                <button onclick="contactMember('${member.contact}')">Contact</button>
                 <button onclick="editMember(${index})">Edit</button>
+                <button onclick="saveMember(${index})" style="display:none;">Save</button>
                 <button onclick="deleteMember(${index})">Delete</button>
             </td>
         `;
@@ -96,46 +118,3 @@ document.getElementById('add-member-form').addEventListener('submit', (e) => {
     e.preventDefault();
     addMember();
 });
-
-// Task Management
-const taskList = document.getElementById("task-list");
-
-function populateTaskList() {
-    taskList.innerHTML = ""; // Clear existing tasks
-    tasks.forEach((task, index) => {
-        const taskItem = document.createElement("li");
-        taskItem.innerHTML = `
-            <h3 contenteditable="true">${task.title}</h3>
-            <p contenteditable="true">${task.description}</p>
-            <button onclick="markTaskCompleted(${index})">Mark as Completed</button>
-            <button onclick="deleteTask(${index})">Delete</button>
-        `;
-        taskList.appendChild(taskItem);
-    });
-}
-
-function addTask() {
-    const title = document.getElementById('task-title').value;
-    const description = document.getElementById('task-description').value;
-
-    tasks.push({ title, description, completed: false });
-    populateTaskList();
-}
-
-function markTaskCompleted(index) {
-    tasks[index].completed = true;
-    populateTaskList();
-}
-
-function deleteTask(index) {
-    tasks.splice(index, 1);
-    populateTaskList();
-}
-
-document.getElementById('add-task-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    addTask();
-});
-
-const tasks = [];
-  
