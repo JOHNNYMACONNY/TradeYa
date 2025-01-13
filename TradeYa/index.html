@@ -1,109 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Tradeya is a platform for trading skills and services to build community and grow together.">
-  <meta name="keywords" content="skills, trade, community, networking, collaboration">
-  <meta property="og:title" content="Tradeya: Trade Skills. Build Community. Grow Together.">
-  <meta property="og:description" content="Tradeya allows members to trade their skills and services with each other. Join now to start collaborating!">
-  <title>Tradeya: Skills Exchange</title>
-  <link rel="stylesheet" href="style.css">
-  <script defer src="script.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaboration Project Management</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header>
-    <div class="logo">
-      <h1>Tradeya</h1>
-      <p>Trade Skills. Build Community. Grow Together.</p>
+    <header>
+        <h1>Collaboration Project Management</h1>
+    </header>
+    <div class="container">
+        <h2>Team Members</h2>
+        <input type="text" id="search-bar" placeholder="Search members..." oninput="searchUsers()">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Skills</th>
+                    <th>Needs</th>
+                    <th>Portfolio</th>
+                    <th>Contact</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="team-list"></tbody>
+        </table>
+
+        <h3>Add New Member</h3>
+        <form id="add-member-form">
+            <input type="text" id="new-name" placeholder="Name" required>
+            <input type="text" id="new-skills" placeholder="Skills" required>
+            <input type="text" id="new-needs" placeholder="Needs" required>
+            <input type="text" id="new-portfolio" placeholder="Portfolio URL" required>
+            <input type="email" id="new-contact" placeholder="Contact Email" required>
+            <button type="submit">Add Member</button>
+        </form>
+
+        <h2>Tasks</h2>
+        <ul id="task-list"></ul>
+
+        <h3>Add New Task</h3>
+        <form id="add-task-form">
+            <input type="text" id="task-title" placeholder="Task Title" required>
+            <input type="text" id="task-description" placeholder="Task Description" required>
+            <input type="text" id="task-requester" placeholder="Requested by" required>
+            <input type="email" id="task-contact" placeholder="Contact Email" required>
+            <button type="submit">Add Task</button>
+        </form>
+
+        <h2>Collaboration Projects</h2>
+        <ul id="collab-list"></ul>
+
+        <h3>Add New Collaboration Project</h3>
+        <form id="add-collab-form">
+            <input type="text" id="collab-title" placeholder="Project Title" required>
+            <input type="text" id="collab-description" placeholder="Project Description" required>
+            <input type="text" id="collab-positions" placeholder="Positions Needed (comma separated)" required>
+            <button type="submit">Add Project</button>
+        </form>
     </div>
-    <nav>
-      <ul>
-        <li><a href="#dashboard">Dashboard</a></li>
-        <li><a href="#team-section">Team</a></li>
-        <li><a href="#task-section">Tasks</a></li>
-      </ul>
-    </nav>
-  </header>
-
-  <main>
-    <!-- Dashboard Section -->
-    <section id="dashboard">
-      <h2>Welcome, [User Name]</h2>
-      <div class="dashboard-grid">
-        <!-- Dashboard Content -->
-      </div>
-    </section>
-
-    <!-- Team Section -->
-    <section id="team-section">
-      <h2>Team Members</h2>
-      <div class="search-bar">
-        <input type="text" id="search-bar" placeholder="Search by skill or need">
-        <button onclick="searchUsers()">Search</button>
-      </div>
-      <table id="team-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Skills</th>
-            <th>Needs</th>
-            <th>Portfolio</th>
-            <th>Contact</th>
-          </tr>
-        </thead>
-        <tbody id="team-list">
-          <!-- Table Rows Generated Dynamically -->
-        </tbody>
-      </table>
-    </section>
-
-    <!-- Add Member Section -->
-    <section id="add-member">
-      <h2>Add New Member</h2>
-      <form id="add-member-form">
-        <input type="text" id="new-name" placeholder="Enter name" required>
-        <input type="text" id="new-skills" placeholder="Enter skills (comma separated)" required>
-        <input type="text" id="new-needs" placeholder="Enter needs (comma separated)" required>
-        <input type="text" id="new-portfolio" placeholder="Enter portfolio link" required>
-        <button type="submit">Add Member</button>
-      </form>
-    </section>
-
-    <!-- Task Section -->
-    <section id="task-section">
-      <h2>Task Requests</h2>
-      <form id="add-task-form">
-        <input type="text" id="task-title" placeholder="Enter task title" required>
-        <textarea id="task-description" placeholder="Enter task description" required></textarea>
-        <button type="submit">Add Task</button>
-      </form>
-      <ul id="task-list">
-        <!-- Task Items Generated Dynamically -->
-      </ul>
-    </section>
-
-    <!-- Calendar Section -->
-    <section id="calendar">
-      <h2>Shared Calendar</h2>
-      <div id="calendar-container"></div>
-    </section>
-
-    <!-- Modals -->
-    <div id="profile-modal" class="modal hidden">
-      <div class="modal-content">
-        <!-- Modal Content -->
-      </div>
-    </div>
-  </main>
-
-  <footer>
-    <p>© 2025 Tradeya. All rights reserved.</p>
-    <div class="social-media">
-      <a href="https://facebook.com" target="_blank">Facebook</a>
-      <a href="https://twitter.com" target="_blank">Twitter</a>
-      <a href="https://instagram.com" target="_blank">Instagram</a>
-    </div>
-  </footer>
+    <footer>
+        <p>&copy; 2023 Collaboration Project Management</p>
+    </footer>
+    <script src="script.js"></script>
 </body>
 </html>
