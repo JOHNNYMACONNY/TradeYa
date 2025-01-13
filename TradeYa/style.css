@@ -1,237 +1,103 @@
-/* General Reset and Base Styles */
-* {
+body {
+  font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  background-color: #f4f4f4;
 }
 
-body {
-  font-family: 'Arial', sans-serif;
-  background-color: #E5E5E5;
-  color: #333;
-  line-height: 1.6;
-}
-
-a {
-  text-decoration: none;
-  color: #14213D;
-}
-
-a:hover {
-  color: #FCA311;
-}
-
-/* Header */
-header {
-  background-color: #14213D;
-  color: #FFF;
-  padding: 10px 0;
+header, footer {
+  background-color: #333;
+  color: white;
   text-align: center;
+  padding: 10px 0;
 }
 
-header .logo h1 {
-  font-size: 2rem;
+header h1, footer p {
+  margin: 0;
 }
 
-header nav ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-header nav ul li {
-  display: inline-block;
-  margin: 0 20px;
-}
-
-header nav ul li a {
-  font-size: 1.2rem;
-  color: #FFFFFF;
-}
-
-header nav ul li a:hover {
-  color: #FCA311;
-}
-
-/* Dashboard */
-#dashboard {
-  padding: 20px;
-  background-color: #FFFFFF;
-  border-radius: 8px;
-  margin: 20px;
-}
-
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-/* Team Section */
-#team-section {
+.container {
   padding: 20px;
 }
 
-.search-bar {
+h1, h2, h3 {
+  color: #333;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
   margin-bottom: 20px;
 }
 
-#search-bar {
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+}
+
+input[type="text"], input[type="email"] {
+  width: calc(100% - 22px);
   padding: 10px;
-  width: 80%;
-  margin-right: 10px;
+  margin: 5px 0 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 button {
-  background-color: #FCA311;
-  padding: 10px;
-  color: #fff;
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  margin: 5px 0;
   border: none;
+  border-radius: 4px;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #14213D;
+  background-color: #45a049;
 }
 
-#team-table {
-  width: 100%;
-  border-collapse: collapse;
+form {
+  margin-bottom: 20px;
 }
 
-#team-table th, #team-table td {
-  padding: 10px;
-  text-align: left;
-}
-
-#team-table tr:nth-child(even) {
-  background-color: #f4f4f4;
-}
-
-#team-table th {
-  background-color: #14213D;
-  color: #FFF;
-}
-
-#team-table td a {
-  color: #FCA311;
-}
-
-#team-table td button {
-  background-color: #14213D;
-  color: #fff;
-}
-
-/* Add Member Section */
-#add-member {
-  padding: 20px;
-  background-color: #FFFFFF;
-  border-radius: 8px;
-  margin: 20px;
-}
-
-#add-member-form input, #add-member-form button {
-  display: block;
-  margin: 10px 0;
-  padding: 10px;
-  width: 100%;
-}
-
-/* Task Section */
-#task-section {
-  padding: 20px;
-  background-color: #FFFFFF;
-  border-radius: 8px;
-  margin: 20px;
-}
-
-#add-task-form input, #add-task-form textarea, #add-task-form button {
-  display: block;
-  margin: 10px 0;
-  padding: 10px;
-  width: 100%;
-}
-
-#task-list {
+ul {
   list-style-type: none;
   padding: 0;
 }
 
-#task-list li {
-  background-color: #f4f4f4;
-  padding: 10px;
+li {
+  background-color: #fff;
   margin: 10px 0;
-  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
-#task-list li h3 {
-  margin-bottom: 10px;
-}
-
-#task-list li button {
-  margin-right: 10px;
-}
-
-/* Footer */
-footer {
-  background-color: #14213D;
-  color: #FFF;
-  text-align: center;
-  padding: 10px 0;
-}
-
-footer .social-media a {
-  color: #FFF;
-  margin: 0 10px;
-}
-
-footer .social-media a:hover {
-  color: #FCA311;
-}
-
-/* Modal */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
+.progress-bar {
   width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgb(0,0,0);
-  background-color: rgba(0,0,0,0.4);
-  padding-top: 60px;
+  background-color: #f3f3f3;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 10px;
 }
 
-.modal-content {
-  background-color: #fefefe;
-  margin: 5% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
-}
-
-.close-btn {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close-btn:hover,
-.close-btn:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .dashboard-grid {
-      grid-template-columns: 1fr;
-  }
-
-  #add-member-form input, #add-member-form button, #add-task-form input, #add-task-form textarea, #add-task-form button {
-      width: 100%;
-  }
+.progress-bar-fill {
+  height: 20px;
+  background-color: #4CAF50;
+  width: 0;
+  transition: width 0.5s;
 }
