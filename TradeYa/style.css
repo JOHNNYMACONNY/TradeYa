@@ -156,3 +156,56 @@ li {
       padding: 15px;
   }
 }
+
+/* Dark Mode Styles */
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+header.dark-mode, footer.dark-mode {
+    background-color: #1e1e1e;
+}
+
+table.dark-mode {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+th.dark-mode, td.dark-mode {
+    border-color: #333333;
+}
+
+button.dark-mode {
+    background-color: #333333;
+    color: #ffffff;
+}
+
+button.dark-mode:hover {
+    background-color: #444444;
+}
+
+/* Animations */
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    margin: 5px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+}
+
+.alert {
+    transition: opacity 0.5s ease;
+}
+
+.alert.hide {
+    opacity: 0;
+}
