@@ -351,6 +351,15 @@ function populateCollabList() {
     });
 }
 
+function signUpForPosition(projectIndex, positionIndex) {
+    const memberName = prompt("Enter your name to sign up for this position:");
+    if (memberName) {
+        collabProjects[projectIndex].positions[positionIndex].member = memberName;
+        populateCollabList();
+        saveToLocalStorage();
+        showAlert('Signed up for position successfully!');
+}
+
 function addCollab() {
     const title = document.getElementById('collab-title').value;
     const description = document.getElementById('collab-description').value;
