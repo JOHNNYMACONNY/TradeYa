@@ -79,24 +79,38 @@ function showAlert(message, type = 'success') {
     }, 3000);
 }
 
-function populateTeamTable() {
-    teamList.innerHTML = ""; // Clear existing rows
-    teamMembers.forEach((member, index) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td contenteditable="false">${member.name}</td>
-            <td contenteditable="false">${member.skills}</td>
-            <td contenteditable="false">${member.needs}</td>
-            <td contenteditable="false"><a href="${member.portfolio}" target="_blank">${member.portfolio}</a></td>
-            <td contenteditable="false">${member.contact}</td>
-            <td>
-                <button onclick="contactMember('${member.contact}')">Contact</button>
-                <button onclick="editMember(${index})">Edit</button>
-                <button onclick="saveMember(${index})" style="display:none;">Save</button>
-                <button onclick="deleteMember(${index})">Delete</button>
-            </td>
-        `;
-        teamList.appendChild(row);
+function populateCollabList() {
+    collabList.innerHTML = ""; // Clear existing projects
+    collabProjects.forEach((project, index) => {
+        if (!project.completed) {
+            const projectItem = document.createElement("li");
+            projectItem.innerHTML = `
+                <h3 contenteditable="true">${project.title}</h3>
+                <p contenteditable="true">${project.description}</p>
+                <p>Positions Needed: ${project.positions.map((pos, posIndex) => `
+                    <span contenteditable="true">${pos.name} ${pos.member ? `(Assigned to: ${pos.member})` : ''}</span>
+                    ${!pos.member ? `<button onclick="signUpForPosition(${index}, ${posIndex})">Sign Up</button>` : ''}
+                    <button onclick="editPosition(${index}, ${posIndex})">Edit</button>
+                    <button onclick="savePosition(${index}, ${posIndex})" style="display:none;">Save</button>
+                `).join(', ')}</p>
+                <ul>
+                    ${project.steps.map((step, stepIndex) => `
+                        <li>
+                            <input type="checkbox" ${step.completed ? 'checked' : ''} onclick="toggleStep(${index}, ${stepIndex})">
+                            ${step.description}
+                        </li>
+                    `).join('')}
+                </ul>
+                <div class="progress-bar">
+                    <div class="progress-bar-fill" style="width: ${project.progress}%"></div>
+                </div>
+                <button onclick="editCollab(${index})">Edit</button>
+                <button onclick="saveCollab(${index})" style="display:none;">Save</button>
+                <button onclick="deleteCollab(${index})">Delete</button>
+                <button onclick="markCollabCompleted(${index})">Mark as Completed</button>
+            `;
+            collabList.appendChild(projectItem);
+        }
     });
 }
 
@@ -269,11 +283,12 @@ function saveTask(index) {
     showAlert('Task saved successfully!');
 }
 
-function markTaskCompleted(index) {
-    tasks[index].completed = true;
-    populateTaskList();
+function markCollabCompleted(index) {
+    collabProjects[index].completed = true;
+    populateCollabList();
+    populateCompletedCollabList();
     saveToLocalStorage();
-    showAlert('Task marked as completed!');
+    showAlert('Collaboration project marked as completed!');
 }
 
 function deleteTask(index) {
@@ -441,8 +456,30 @@ function populateCompletedCollabList() {
     });
 }
 
+document.getElementById('add-member-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (validateForm(e.target)) {
+        addMember();
+    }
+});
+
+document.getElementById('add-task-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (validateForm(e.target)) {
+        addTask();
+    }
+});
+
+document.getElementById('add-collab-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (validateForm(e.target)) {
+        addCollab();
+    }
+});
+
 document.addEventListener("DOMContentLoaded", () => {
     populateTeamTable();
     populateTaskList();
     populateCollabList();
+    populateCompletedCollabList();
 });
