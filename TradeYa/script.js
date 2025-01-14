@@ -26,6 +26,27 @@ function saveToLocalStorage() {
     localStorage.setItem('collabProjects', JSON.stringify(collabProjects));
 }
 
+// User feedback function
+function showAlert(message, type = 'success') {
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show`;
+    alert.role = 'alert';
+    alert.innerHTML = `
+        <strong>${type === 'success' ? 'Success!' : 'Error!'}</strong> ${message}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    `;
+    document.body.appendChild(alert);
+    setTimeout(() => {
+        alert.classList.remove('show');
+        alert.classList.add('hide');
+        setTimeout(() => {
+            alert.remove();
+        }, 500);
+    }, 3000);
+}
+
 // Form validation function
 function validateForm(form) {
     let isValid = true;
@@ -39,6 +60,12 @@ function validateForm(form) {
         }
     });
     return isValid;
+}
+
+// Email validation function
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
 }
 
 // User feedback function
@@ -164,6 +191,27 @@ document.getElementById('add-member-form').addEventListener('submit', (e) => {
     }
 });
 
+document.getElementById('add-task-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (validateForm(e.target)) {
+        addTask();
+    }
+});
+
+document.getElementById('add-collab-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (validateForm(e.target)) {
+        addCollab();
+    }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    populateTeamTable();
+    populateTaskList();
+    populateCollabList();
+    populateCompletedCollabList();
+});
+
 // Task Management
 
 function populateTaskList() {
@@ -247,32 +295,35 @@ document.getElementById('add-task-form').addEventListener('submit', (e) => {
 function populateCollabList() {
     collabList.innerHTML = ""; // Clear existing projects
     collabProjects.forEach((project, index) => {
-        const projectItem = document.createElement("li");
-        projectItem.innerHTML = `
-            <h3 contenteditable="true">${project.title}</h3>
-            <p contenteditable="true">${project.description}</p>
-            <p>Positions Needed: ${project.positions.map((pos, posIndex) => `
-                <span contenteditable="true">${pos.name} ${pos.member ? `(Assigned to: ${pos.member})` : ''}</span>
-                ${!pos.member ? `<button onclick="signUpForPosition(${index}, ${posIndex})">Sign Up</button>` : ''}
-                <button onclick="editPosition(${index}, ${posIndex})">Edit</button>
-                <button onclick="savePosition(${index}, ${posIndex})" style="display:none;">Save</button>
-            `).join(', ')}</p>
-            <ul>
-                ${project.steps.map((step, stepIndex) => `
-                    <li>
-                        <input type="checkbox" ${step.completed ? 'checked' : ''} onclick="toggleStep(${index}, ${stepIndex})">
-                        ${step.description}
-                    </li>
-                `).join('')}
-            </ul>
-            <div class="progress-bar">
-                <div class="progress-bar-fill" style="width: ${project.progress}%"></div>
-            </div>
-            <button onclick="editCollab(${index})">Edit</button>
-            <button onclick="saveCollab(${index})" style="display:none;">Save</button>
-            <button onclick="deleteCollab(${index})">Delete</button>
-        `;
-        collabList.appendChild(projectItem);
+        if (!project.completed) {
+            const projectItem = document.createElement("li");
+            projectItem.innerHTML = `
+                <h3 contenteditable="true">${project.title}</h3>
+                <p contenteditable="true">${project.description}</p>
+                <p>Positions Needed: ${project.positions.map((pos, posIndex) => `
+                    <span contenteditable="true">${pos.name} ${pos.member ? `(Assigned to: ${pos.member})` : ''}</span>
+                    ${!pos.member ? `<button onclick="signUpForPosition(${index}, ${posIndex})">Sign Up</button>` : ''}
+                    <button onclick="editPosition(${index}, ${posIndex})">Edit</button>
+                    <button onclick="savePosition(${index}, ${posIndex})" style="display:none;">Save</button>
+                `).join(', ')}</p>
+                <ul>
+                    ${project.steps.map((step, stepIndex) => `
+                        <li>
+                            <input type="checkbox" ${step.completed ? 'checked' : ''} onclick="toggleStep(${index}, ${stepIndex})">
+                            ${step.description}
+                        </li>
+                    `).join('')}
+                </ul>
+                <div class="progress-bar">
+                    <div class="progress-bar-fill" style="width: ${project.progress}%"></div>
+                </div>
+                <button onclick="editCollab(${index})">Edit</button>
+                <button onclick="saveCollab(${index})" style="display:none;">Save</button>
+                <button onclick="deleteCollab(${index})">Delete</button>
+                <button onclick="markCollabCompleted(${index})">Mark as Completed</button>
+            `;
+            collabList.appendChild(projectItem);
+        }
     });
 }
 
@@ -361,6 +412,33 @@ function savePosition(projectIndex, positionIndex) {
     projectItem.querySelectorAll('button[onclick^="savePosition"]')[positionIndex].style.display = "none";
     saveToLocalStorage();
     showAlert('Position saved successfully!');
+}
+
+function markCollabCompleted(index) {
+    collabProjects[index].completed = true;
+    populateCollabList();
+    populateCompletedCollabList();
+    saveToLocalStorage();
+    showAlert('Collaboration project marked as completed!');
+}
+
+function populateCompletedCollabList() {
+    const completedCollabList = document.getElementById("completed-collab-list");
+    completedCollabList.innerHTML = ""; // Clear existing projects
+    collabProjects.forEach((project, index) => {
+        if (project.completed) {
+            const projectItem = document.createElement("li");
+            projectItem.innerHTML = `
+                <h3>${project.title}</h3>
+                <p>${project.description}</p>
+                <p>Positions: ${project.positions.map(pos => `
+                    <span>${pos.name} ${pos.member ? `(Assigned to: ${pos.member})` : ''}</span>
+                `).join(', ')}</p>
+                <a href="${project.link}" target="_blank">View Project</a>
+            `;
+            completedCollabList.appendChild(projectItem);
+        }
+    });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
