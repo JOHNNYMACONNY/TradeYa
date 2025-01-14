@@ -86,19 +86,21 @@ function showAlert(message, type = 'success') {
     }, 3000);
 }
 
+// Collaboration Projects Display
+
 function populateCollabList() {
+    const collabList = document.getElementById("collab-list");
     collabList.innerHTML = ""; // Clear existing projects
     collabProjects.forEach((project, index) => {
         if (!project.completed) {
             const projectItem = document.createElement("li");
+            projectItem.className = "list-group-item";
             projectItem.innerHTML = `
-                <h3 contenteditable="true">${project.title}</h3>
-                <p contenteditable="true">${project.description}</p>
+                <h3>${project.title}</h3>
+                <p>${project.description}</p>
                 <p>Positions Needed: ${project.positions.map((pos, posIndex) => `
-                    <span contenteditable="true">${pos.name} ${pos.member ? `(Assigned to: ${pos.member})` : ''}</span>
-                    ${!pos.member ? `<button onclick="signUpForPosition(${index}, ${posIndex})">Sign Up</button>` : ''}
-                    <button onclick="editPosition(${index}, ${posIndex})">Edit</button>
-                    <button onclick="savePosition(${index}, ${posIndex})" style="display:none;">Save</button>
+                    <span>${pos.name} ${pos.member ? `(Assigned to: ${pos.member})` : ''}</span>
+                    ${!pos.member ? `<button class="btn btn-sm btn-primary" onclick="signUpForPosition(${index}, ${posIndex})">Sign Up</button>` : ''}
                 `).join(', ')}</p>
                 <ul>
                     ${project.steps.map((step, stepIndex) => `
@@ -111,10 +113,10 @@ function populateCollabList() {
                 <div class="progress-bar">
                     <div class="progress-bar-fill" style="width: ${project.progress}%"></div>
                 </div>
-                <button onclick="editCollab(${index})">Edit</button>
-                <button onclick="saveCollab(${index})" style="display:none;">Save</button>
-                <button onclick="deleteCollab(${index})">Delete</button>
-                <button onclick="markCollabCompleted(${index})">Mark as Completed</button>
+                <button class="btn btn-sm btn-secondary" onclick="editCollab(${index})">Edit</button>
+                <button class="btn btn-sm btn-success" onclick="saveCollab(${index})" style="display:none;">Save</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteCollab(${index})">Delete</button>
+                <button class="btn btn-sm btn-warning" onclick="markCollabCompleted(${index})">Mark as Completed</button>
             `;
             collabList.appendChild(projectItem);
         }
