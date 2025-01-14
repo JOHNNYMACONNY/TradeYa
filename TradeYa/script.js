@@ -27,6 +27,13 @@ function saveToLocalStorage() {
 }
 
 // User feedback function
+function saveToLocalStorage() {
+    localStorage.setItem('teamMembers', JSON.stringify(teamMembers));
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    localStorage.setItem('collabProjects', JSON.stringify(collabProjects));
+}
+
+// User feedback function
 function showAlert(message, type = 'success') {
     const alert = document.createElement('div');
     alert.className = `alert alert-${type} alert-dismissible fade show`;
@@ -456,6 +463,7 @@ function populateCompletedCollabList() {
     });
 }
 
+// Event Listeners 
 document.getElementById('add-member-form').addEventListener('submit', (e) => {
     e.preventDefault();
     if (validateForm(e.target)) {
@@ -482,4 +490,15 @@ document.addEventListener("DOMContentLoaded", () => {
     populateTaskList();
     populateCollabList();
     populateCompletedCollabList();
+});
+
+// Dark Mode Toggle Functionality
+document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    document.querySelector('header').classList.toggle('dark-mode');
+    document.querySelector('footer').classList.toggle('dark-mode');
+    document.querySelectorAll('table').forEach(table => table.classList.toggle('dark-mode'));
+    document.querySelectorAll('th').forEach(th => th.classList.toggle('dark-mode'));
+    document.querySelectorAll('td').forEach(td => td.classList.toggle('dark-mode'));
+    document.querySelectorAll('button').forEach(button => button.classList.toggle('dark-mode'));
 });
