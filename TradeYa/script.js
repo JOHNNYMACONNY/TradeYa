@@ -1,24 +1,162 @@
-function populateTeamTable(teamMembers) {
-    const teamList = document.getElementById("team-list");
-    teamList.innerHTML = ""; // Clear existing rows
-    teamMembers.forEach((member, index) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td contenteditable="false">${member.name}</td>
-            <td contenteditable="false">${member.skills}</td>
-            <td contenteditable="false">${member.needs}</td>
-            <td contenteditable="false"><a href="${member.portfolio}" target="_blank">${member.portfolio}</a></td>
-            <td contenteditable="false">${member.contact}</td>
-            <td>
-                <button onclick="contactMember('${member.contact}')">Contact</button>
-                <button onclick="editMember(${index})">Edit</button>
-                <button onclick="saveMember(${index})" style="display:none;">Save</button>
-                <button onclick="deleteMember(${index})">Delete</button>
-            </td>
-        `;
-        teamList.appendChild(row);
-    });
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, deleteDoc } from "firebase/firestore";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyCCr7wxWHJyv4C9pGOJ0Juf7latDmceTew",
+  authDomain: "tradeya-45ede.firebaseapp.com",
+  projectId: "tradeya-45ede",
+  storageBucket: "tradeya-45ede.firebasestorage.app",
+  messagingSenderId: "476911238747",
+  appId: "1:476911238747:web:e9b73b157f3fa63ba4897e",
+  measurementId: "G-XNL1Y7CZWW"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, getDocs, setDoc, doc } from "firebase/firestore";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Initial team members data
+const initialTeamMembers = [
+    { name: "Adrian", skills: "Logistics, Performing Music", needs: "Promotion, Event Coordination", portfolio: "#", contact: "adrian@example.com" },
+    { name: "Izzy", skills: "Clothing Brand, Merch", needs: "Graphic Design", portfolio: "#", contact: "izzy@example.com" },
+    { name: "TLOK", skills: "Engineering, Producing, Audio Edit", needs: "Mixing Mastering", portfolio: "#", contact: "tlok@example.com" },
+    { name: "RJ", skills: "Setup, House Engineer, DJ", needs: "Event Planning", portfolio: "#", contact: "rj@example.com" },
+    { name: "Johnny Maconny", skills: "Audio Engineering, Podcast Editing", needs: "Web Development", portfolio: "#", contact: "johnny@example.com" },
+    { name: "Benny", skills: "Filming, Editing, Radio Connections", needs: "Collaborative Projects", portfolio: "#", contact: "benny@example.com" },
+    { name: "Jaylon", skills: "Beatmaking, Admin, Promo", needs: "Marketing Assistance", portfolio: "#", contact: "jaylon@example.com" },
+    { name: "Greg", skills: "Music Production, Instrumentalist", needs: "Studio Space", portfolio: "#", contact: "greg@example.com" },
+    { name: "Juan", skills: "Accounting, Brand Development", needs: "Music Marketing", portfolio: "#", contact: "juan@example.com" },
+    { name: "Mike", skills: "Songwriting, Vlog Editing", needs: "Distribution Channels", portfolio: "#", contact: "mike@example.com" },
+    { name: "Thalita", skills: "Styling, Marketing Strategy", needs: "Portfolio Shoots", portfolio: "#", contact: "thalita@example.com" }
+];
+
+// Function to save initial data to Firestore
+async function saveInitialData() {
+    const docRef = doc(db, 'teamMembers', 'data');
+    await setDoc(docRef, { teamMembers: initialTeamMembers });
+    console.log('Initial team members data saved to Firestore');
 }
+
+// Call this function once to save the initial data
+saveInitialData();
+
+// Fetch Data from Firestore
+async function fetchData(collectionName) {
+    const querySnapshot = await getDocs(collection(db, collectionName));
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
+// Add Data to Firestore
+async function addData(collectionName, data) {
+    const docRef = await addDoc(collection(db, collectionName), data);
+    return { id: docRef.id, ...data };
+}
+
+// Update Data in Firestore
+async function updateData(collectionName, id, data) {
+    const docRef = doc(db, collectionName, id);
+    await updateDoc(docRef, data);
+}
+
+// Delete Data from Firestore
+async function deleteData(collectionName, id) {
+    const docRef = doc(db, collectionName, id);
+    await deleteDoc(docRef);
+}
+
+// Load Data
+async function loadTeamMembers() {
+    const teamMembers = await fetchData('teamMembers');
+    // Populate team members in the UI
+}
+
+async function loadTasks() {
+    const tasks = await fetchData('tasks');
+    // Populate tasks in the UI
+}
+
+async function loadCollabProjects() {
+    const collabProjects = await fetchData('collabProjects');
+    // Populate collaboration projects in the UI
+}
+
+// Add Data
+async function addTeamMember(member) {
+    const newMember = await addData('teamMembers', member);
+    // Add new member to the UI
+}
+
+async function addTask(task) {
+    const newTask = await addData('tasks', task);
+    // Add new task to the UI
+}
+
+async function addCollabProject(project) {
+    const newProject = await addData('collabProjects', project);
+    // Add new project to the UI
+}
+
+// Event Listeners
+document.addEventListener("DOMContentLoaded", () => {
+    loadTeamMembers();
+    loadTasks();
+    loadCollabProjects();
+});
+
+document.getElementById('add-member-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const member = {
+        name: document.getElementById('new-name').value,
+        skills: document.getElementById('new-skills').value,
+        needs: document.getElementById('new-needs').value,
+        portfolio: document.getElementById('new-portfolio').value,
+        contact: document.getElementById('new-contact').value
+    };
+    await addTeamMember(member);
+});
+
+document.getElementById('add-task-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const task = {
+        title: document.getElementById('task-title').value,
+        description: document.getElementById('task-description').value,
+        requester: document.getElementById('task-requester').value,
+        contact: document.getElementById('task-contact').value,
+        completed: false
+    };
+    await addTask(task);
+});
+
+document.getElementById('add-collab-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const project = {
+        title: document.getElementById('collab-title').value,
+        description: document.getElementById('collab-description').value,
+        positions: document.getElementById('collab-positions').value.split(',').map(pos => ({ name: pos.trim(), member: null })),
+        steps: [],
+        progress: 0,
+        completed: false
+    };
+    await addCollabProject(project);
+});
 
 // Load data from local storage or use default data
 const teamMembers = JSON.parse(localStorage.getItem('teamMembers')) || [
