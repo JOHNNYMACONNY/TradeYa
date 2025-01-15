@@ -1,20 +1,20 @@
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, deleteDoc } from "firebase/firestore";
+import { getFirestore, collection, getDocs, setDoc, doc, getDoc, addDoc, updateDoc, deleteDoc } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyCCr7wxWHJyv4C9pGOJ0Juf7latDmceTew",
-  authDomain: "tradeya-45ede.firebaseapp.com",
-  projectId: "tradeya-45ede",
-  storageBucket: "tradeya-45ede.firebasestorage.app",
-  messagingSenderId: "476911238747",
-  appId: "1:476911238747:web:e9b73b157f3fa63ba4897e",
-  measurementId: "G-XNL1Y7CZWW"
+    authDomain: "tradeya-45ede.firebaseapp.com",
+    projectId: "tradeya-45ede",
+    storageBucket: "tradeya-45ede.firebasestorage.app",
+    messagingSenderId: "476911238747",
+    appId: "1:476911238747:web:e9b73b157f3fa63ba4897e",
+    measurementId: "G-XNL1Y7CZWW"
 };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 // Initial team members data
 const initialTeamMembers = [
@@ -43,58 +43,91 @@ saveInitialData();
 
 // Fetch Data from Firestore
 async function fetchData(collectionName) {
-    const querySnapshot = await getDocs(collection(db, collectionName));
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-}
-
-// Add Data to Firestore
-async function addData(collectionName, data) {
-    const docRef = await addDoc(collection(db, collectionName), data);
-    return { id: docRef.id, ...data };
-}
-
-// Update Data in Firestore
-async function updateData(collectionName, id, data) {
-    const docRef = doc(db, collectionName, id);
-    await updateDoc(docRef, data);
-}
-
-// Delete Data from Firestore
-async function deleteData(collectionName, id) {
-    const docRef = doc(db, collectionName, id);
-    await deleteDoc(docRef);
+    const docRef = doc(db, collectionName, 'data');
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        return docSnap.data().teamMembers;
+    } else {
+        console.log("No such document!");
+        return [];
+    }
 }
 
 // Load Data
 async function loadTeamMembers() {
     const teamMembers = await fetchData('teamMembers');
-    // Populate team members in the UI
+    populateTeamTable(teamMembers);
 }
 
 async function loadTasks() {
     const tasks = await fetchData('tasks');
-    // Populate tasks in the UI
+    populateTaskList(tasks);
 }
 
 async function loadCollabProjects() {
     const collabProjects = await fetchData('collabProjects');
-    // Populate collaboration projects in the UI
+    populateCollabList(collabProjects);
+    populateCompletedCollabList(collabProjects);
 }
 
-// Add Data
+// Populate Team Members
+function populateTeamTable(teamMembers) {
+    const teamList = document.getElementById("team-list");
+    teamList.innerHTML = ""; // Clear existing rows
+    teamMembers.forEach((member, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td contenteditable="false">${member.name}</td>
+            <td contenteditable="false">${member.skills}</td>
+            <td contenteditable="false">${member.needs}</td>
+            <td contenteditable="false"><a href="${member.portfolio}" target="_blank">${member.portfolio}</a></td>
+            <td contenteditable="false">${member.contact}</td>
+            <td>
+                <button onclick="contactMember('${member.contact}')">Contact</button>
+                <button onclick="editMember(${index})">Edit</button>
+                <button onclick="saveMember(${index})" style="display:none;">Save</button>
+                <button onclick="deleteMember(${index})">Delete</button>
+            </td>
+        `;
+        teamList.appendChild(row);
+    });
+}
+
+// Add Data to Firestore
 async function addTeamMember(member) {
-    const newMember = await addData('teamMembers', member);
-    // Add new member to the UI
+    const docRef = doc(db, 'teamMembers', 'data');
+    const docSnap = await getDoc(docRef);
+    let teamMembers = [];
+    if (docSnap.exists()) {
+        teamMembers = docSnap.data().teamMembers;
+    }
+    teamMembers.push(member);
+    await setDoc(docRef, { teamMembers });
+    loadTeamMembers();
 }
 
 async function addTask(task) {
-    const newTask = await addData('tasks', task);
-    // Add new task to the UI
+    const docRef = doc(db, 'tasks', 'data');
+    const docSnap = await getDoc(docRef);
+    let tasks = [];
+    if (docSnap.exists()) {
+        tasks = docSnap.data().tasks;
+    }
+    tasks.push(task);
+    await setDoc(docRef, { tasks });
+    loadTasks();
 }
 
 async function addCollabProject(project) {
-    const newProject = await addData('collabProjects', project);
-    // Add new project to the UI
+    const docRef = doc(db, 'collabProjects', 'data');
+    const docSnap = await getDoc(docRef);
+    let collabProjects = [];
+    if (docSnap.exists()) {
+        collabProjects = docSnap.data().collabProjects;
+    }
+    collabProjects.push(project);
+    await setDoc(docRef, { collabProjects });
+    loadCollabProjects();
 }
 
 // Event Listeners
@@ -200,7 +233,7 @@ function showAlert(message, type = 'success') {
 
 // Collaboration Projects Display
 
-async function populateCollabList() {
+async function populateCollabList(collabProjects) {
     const collabList = document.getElementById("collab-list");
     collabList.innerHTML = ""; // Clear existing projects
     collabProjects.forEach((project, index) => {
@@ -307,6 +340,12 @@ async function addMember() {
 
 async function searchUsers() {
     const query = document.getElementById("search-bar").value.toLowerCase();
+    const docRef = doc(db, 'teamMembers', 'data');
+    const docSnap = await getDoc(docRef);
+    let teamMembers = [];
+    if (docSnap.exists()) {
+        teamMembers = docSnap.data().teamMembers;
+    }
     const filteredMembers = teamMembers.filter(member =>
         member.skills.toLowerCase().includes(query) ||
         member.needs.toLowerCase().includes(query) ||
@@ -333,39 +372,9 @@ async function searchUsers() {
     });
 }
 
-document.addEventListener("DOMContentLoaded", populateTeamTable);
-
-document.getElementById('add-member-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (validateForm(e.target)) {
-        addMember();
-    }
-});
-
-document.getElementById('add-task-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (validateForm(e.target)) {
-        addTask();
-    }
-});
-
-document.getElementById('add-collab-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (validateForm(e.target)) {
-        addCollab();
-    }
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-    populateTeamTable();
-    populateTaskList();
-    populateCollabList();
-    populateCompletedCollabList();
-});
-
 // Task Management
 
-async function populateTaskList() {
+async function populateTaskList(tasks) {
     taskList.innerHTML = ""; // Clear existing tasks
     tasks.forEach((task, index) => {
         const taskItem = document.createElement("li");
@@ -383,14 +392,22 @@ async function populateTaskList() {
     });
 }
 
-function addTask() {
+async function addTask() {
     const title = document.getElementById('task-title').value;
     const description = document.getElementById('task-description').value;
     const requester = document.getElementById('task-requester').value;
     const contact = document.getElementById('task-contact').value;
 
+    const docRef = doc(db, 'tasks', 'data');
+    const docSnap = await getDoc(docRef);
+    let tasks = [];
+    if (docSnap.exists()) {
+        tasks = docSnap.data().tasks;
+    }
     tasks.push({ title, description, requester, contact, completed: false });
-    populateTaskList();
+
+    await setDoc(docRef, { tasks });
+    loadTasks();
     showAlert('Task added successfully!');
 }
 
@@ -475,13 +492,13 @@ async function populateCollabList() {
     });
 }
 
-async function signUpForPosition(projectIndex, positionIndex) {
+async function signUpForPosition(projectIndex, positionIndex){ 
     const memberName = prompt("Enter your name to sign up for this position:");
     if (memberName) {
         collabProjects[projectIndex].positions[positionIndex].member = memberName;
         populateCollabList();
         showAlert('Signed up for position successfully!');
-}
+}}
 
 async function addCollab() {
     const title = document.getElementById('collab-title').value;
@@ -555,7 +572,9 @@ async function editPosition(projectIndex, positionIndex) {
 async function savePosition(projectIndex, positionIndex) {
     const projectItem = collabList.children[projectIndex];
     const positionSpan = projectItem.querySelectorAll('span')[positionIndex];
-    const positionName = positionSpan.innerText.split(' (')[0]; // Remove any assigned member text
+    const positionName = positionSpan.innerText.split(' (')[0]; 
+    
+    // Remove any assigned member text
     collabProjects[projectIndex].positions[positionIndex].name = positionName;
 
     positionSpan.contentEditable = "false";
@@ -620,6 +639,16 @@ document.addEventListener("DOMContentLoaded", () => {
     populateCompletedCollabList();
 });
 
+document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    document.querySelector('header').classList.toggle('dark-mode');
+    document.querySelector('footer').classList.toggle('dark-mode');
+    document.querySelectorAll('table').forEach(table => table.classList.toggle('dark-mode'));
+    document.querySelectorAll('th').forEach(th => th.classList.toggle('dark-mode'));
+    document.querySelectorAll('td').forEach(td => td.classList.toggle('dark-mode'));
+    document.querySelectorAll('button').forEach(button => button.classList.toggle('dark-mode'));
+});
+
 // Dark Mode Toggle Functionality
 document.getElementById('dark-mode-toggle').addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
@@ -629,4 +658,4 @@ document.getElementById('dark-mode-toggle').addEventListener('click', () => {
     document.querySelectorAll('th').forEach(th => th.classList.toggle('dark-mode'));
     document.querySelectorAll('td').forEach(td => td.classList.toggle('dark-mode'));
     document.querySelectorAll('button').forEach(button => button.classList.toggle('dark-mode'));
-});}
+});
