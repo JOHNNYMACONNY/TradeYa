@@ -1,3 +1,121 @@
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, deleteDoc } from "firebase/firestore";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyCCr7wxWHJyv4C9pGOJ0Juf7latDmceTew",
+  authDomain: "tradeya-45ede.firebaseapp.com",
+  projectId: "tradeya-45ede",
+  storageBucket: "tradeya-45ede.firebasestorage.app",
+  messagingSenderId: "476911238747",
+  appId: "1:476911238747:web:e9b73b157f3fa63ba4897e",
+  measurementId: "G-XNL1Y7CZWW"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Fetch Data from Firestore
+async function fetchData(collectionName) {
+    const querySnapshot = await getDocs(collection(db, collectionName));
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
+// Add Data to Firestore
+async function addData(collectionName, data) {
+    const docRef = await addDoc(collection(db, collectionName), data);
+    return { id: docRef.id, ...data };
+}
+
+// Update Data in Firestore
+async function updateData(collectionName, id, data) {
+    const docRef = doc(db, collectionName, id);
+    await updateDoc(docRef, data);
+}
+
+// Delete Data from Firestore
+async function deleteData(collectionName, id) {
+    const docRef = doc(db, collectionName, id);
+    await deleteDoc(docRef);
+}
+
+// Load Data
+async function loadTeamMembers() {
+    const teamMembers = await fetchData('teamMembers');
+    // Populate team members in the UI
+}
+
+async function loadTasks() {
+    const tasks = await fetchData('tasks');
+    // Populate tasks in the UI
+}
+
+async function loadCollabProjects() {
+    const collabProjects = await fetchData('collabProjects');
+    // Populate collaboration projects in the UI
+}
+
+// Add Data
+async function addTeamMember(member) {
+    const newMember = await addData('teamMembers', member);
+    // Add new member to the UI
+}
+
+async function addTask(task) {
+    const newTask = await addData('tasks', task);
+    // Add new task to the UI
+}
+
+async function addCollabProject(project) {
+    const newProject = await addData('collabProjects', project);
+    // Add new project to the UI
+}
+
+// Event Listeners
+document.addEventListener("DOMContentLoaded", () => {
+    loadTeamMembers();
+    loadTasks();
+    loadCollabProjects();
+});
+
+document.getElementById('add-member-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const member = {
+        name: document.getElementById('new-name').value,
+        skills: document.getElementById('new-skills').value,
+        needs: document.getElementById('new-needs').value,
+        portfolio: document.getElementById('new-portfolio').value,
+        contact: document.getElementById('new-contact').value
+    };
+    await addTeamMember(member);
+});
+
+document.getElementById('add-task-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const task = {
+        title: document.getElementById('task-title').value,
+        description: document.getElementById('task-description').value,
+        requester: document.getElementById('task-requester').value,
+        contact: document.getElementById('task-contact').value,
+        completed: false
+    };
+    await addTask(task);
+});
+
+document.getElementById('add-collab-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const project = {
+        title: document.getElementById('collab-title').value,
+        description: document.getElementById('collab-description').value,
+        positions: document.getElementById('collab-positions').value.split(',').map(pos => ({ name: pos.trim(), member: null })),
+        steps: [],
+        progress: 0,
+        completed: false
+    };
+    await addCollabProject(project);
+});
+
 // Load data from local storage or use default data
 const teamMembers = JSON.parse(localStorage.getItem('teamMembers')) || [
     { name: "Adrian", skills: "Logistics, Performing Music", needs: "Promotion, Event Coordination", portfolio: "#", contact: "adrian@example.com" },
@@ -482,6 +600,7 @@ document.getElementById('add-member-form').addEventListener('submit', (e) => {
     }
 });
 
+
 document.getElementById('add-task-form').addEventListener('submit', (e) => {
     e.preventDefault();
     if (validateForm(e.target)) {
@@ -512,4 +631,4 @@ document.getElementById('dark-mode-toggle').addEventListener('click', () => {
     document.querySelectorAll('th').forEach(th => th.classList.toggle('dark-mode'));
     document.querySelectorAll('td').forEach(td => td.classList.toggle('dark-mode'));
     document.querySelectorAll('button').forEach(button => button.classList.toggle('dark-mode'));
-});
+});}
