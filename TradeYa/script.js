@@ -1,3 +1,7 @@
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, deleteDoc } from "firebase/firestore";
 
@@ -11,27 +15,6 @@ const firebaseConfig = {
   appId: "1:476911238747:web:e9b73b157f3fa63ba4897e",
   measurementId: "G-XNL1Y7CZWW"
 };
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, setDoc, doc } from "firebase/firestore";
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
 // Initial team members data
 const initialTeamMembers = [
@@ -158,43 +141,12 @@ document.getElementById('add-collab-form').addEventListener('submit', async (e) 
     await addCollabProject(project);
 });
 
-// Load data from local storage or use default data
-const teamMembers = JSON.parse(localStorage.getItem('teamMembers')) || [
-    { name: "Adrian", skills: "Logistics, Performing Music", needs: "Promotion, Event Coordination", portfolio: "#", contact: "adrian@example.com" },
-    { name: "Izzy", skills: "Clothing Brand, Merch", needs: "Graphic Design", portfolio: "#", contact: "izzy@example.com" },
-    { name: "TLOK", skills: "Engineering, Producing, Audio Edit", needs: "Mixing Mastering", portfolio: "#", contact: "tlok@example.com" },
-    { name: "RJ", skills: "Setup, House Engineer, DJ", needs: "Event Planning", portfolio: "#", contact: "rj@example.com" },
-    { name: "Johnny Maconny", skills: "Audio Engineering, Podcast Editing", needs: "Web Development", portfolio: "#", contact: "johnny@example.com" },
-    { name: "Benny", skills: "Filming, Editing, Radio Connections", needs: "Collaborative Projects", portfolio: "#", contact: "benny@example.com" },
-    { name: "Jaylon", skills: "Beatmaking, Admin, Promo", needs: "Marketing Assistance", portfolio: "#", contact: "jaylon@example.com" },
-    { name: "Greg", skills: "Music Production, Instrumentalist", needs: "Studio Space", portfolio: "#", contact: "greg@example.com" },
-    { name: "Juan", skills: "Accounting, Brand Development", needs: "Music Marketing", portfolio: "#", contact: "juan@example.com" },
-    { name: "Mike", skills: "Songwriting, Vlog Editing", needs: "Distribution Channels", portfolio: "#", contact: "mike@example.com" },
-    { name: "Thalita", skills: "Styling, Marketing Strategy", needs: "Portfolio Shoots", portfolio: "#", contact: "thalita@example.com" }
-];
-
-const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-const collabProjects = JSON.parse(localStorage.getItem('collabProjects')) || [];
-
 const teamList = document.getElementById("team-list");
 const taskList = document.getElementById("task-list");
 const collabList = document.getElementById("collab-list");
 
-function saveToLocalStorage() {
-    localStorage.setItem('teamMembers', JSON.stringify(teamMembers));
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-    localStorage.setItem('collabProjects', JSON.stringify(collabProjects));
-}
-
 // User feedback function
-function saveToLocalStorage() {
-    localStorage.setItem('teamMembers', JSON.stringify(teamMembers));
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-    localStorage.setItem('collabProjects', JSON.stringify(collabProjects));
-}
-
-// User feedback function
-function showAlert(message, type = 'success') {
+async function showAlert(message, type = 'success') {
     const alert = document.createElement('div');
     alert.className = `alert alert-${type} alert-dismissible fade show`;
     alert.role = 'alert';
@@ -215,7 +167,7 @@ function showAlert(message, type = 'success') {
 }
 
 // Form validation function
-function validateForm(form) {
+async function validateForm(form) {
     let isValid = true;
     const inputs = form.querySelectorAll('input[required]');
     inputs.forEach(input => {
@@ -230,7 +182,7 @@ function validateForm(form) {
 }
 
 // Email validation function
-function validateEmail(email) {
+async function validateEmail(email) {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(String(email).toLowerCase());
 }
@@ -248,7 +200,7 @@ function showAlert(message, type = 'success') {
 
 // Collaboration Projects Display
 
-function populateCollabList() {
+async function populateCollabList() {
     const collabList = document.getElementById("collab-list");
     collabList.innerHTML = ""; // Clear existing projects
     collabProjects.forEach((project, index) => {
@@ -283,13 +235,13 @@ function populateCollabList() {
     });
 }
 
-function contactMember(contact) {
+async function contactMember(contact) {
     const subject = encodeURIComponent("Collaboration Opportunity");
     const body = encodeURIComponent("Hi, I would like to discuss a potential collaboration with you.");
     window.location.href = `mailto:${contact}?subject=${subject}&body=${body}`;
 }
 
-function editMember(index) {
+async function editMember(index) {
     const row = teamList.rows[index];
     for (let i = 0; i < 5; i++) {
         row.cells[i].contentEditable = "true";
@@ -298,7 +250,7 @@ function editMember(index) {
     row.cells[5].querySelector('button[onclick^="saveMember"]').style.display = "inline";
 }
 
-function saveMember(index) {
+async function saveMember(index) {
     const row = teamList.rows[index];
     const name = row.cells[0].innerText;
     const skills = row.cells[1].innerText;
@@ -306,38 +258,54 @@ function saveMember(index) {
     const portfolio = row.cells[3].querySelector('a').innerText;
     const contact = row.cells[4].innerText;
 
+    const docRef = doc(db, 'teamMembers', 'data');
+    const docSnap = await getDoc(docRef);
+    let teamMembers = [];
+    if (docSnap.exists()) {
+        teamMembers = docSnap.data().teamMembers;
+    }
     teamMembers[index] = { name, skills, needs, portfolio, contact };
 
-    for (let i = 0; i < 5; i++) {
-        row.cells[i].contentEditable = "false";
-    }
-    row.cells[5].querySelector('button[onclick^="editMember"]').style.display = "inline";
-    row.cells[5].querySelector('button[onclick^="saveMember"]').style.display = "none";
-    saveToLocalStorage();
+    await setDoc(docRef, { teamMembers });
+    loadTeamMembers();
     showAlert('Member saved successfully!');
 }
 
-function deleteMember(index) {
+async function deleteMember(index) {
+    const docRef = doc(db, 'teamMembers', 'data');
+    const docSnap = await getDoc(docRef);
+    let teamMembers = [];
+    if (docSnap.exists()) {
+        teamMembers = docSnap.data().teamMembers;
+    }
     teamMembers.splice(index, 1);
-    populateTeamTable();
-    saveToLocalStorage();
+
+    await setDoc(docRef, { teamMembers });
+    loadTeamMembers();
     showAlert('Member deleted successfully!', 'danger');
 }
 
-function addMember() {
+async function addMember() {
     const name = document.getElementById('new-name').value;
     const skills = document.getElementById('new-skills').value;
     const needs = document.getElementById('new-needs').value;
     const portfolio = document.getElementById('new-portfolio').value;
     const contact = document.getElementById('new-contact').value;
 
+    const docRef = doc(db, 'teamMembers', 'data');
+    const docSnap = await getDoc(docRef);
+    let teamMembers = [];
+    if (docSnap.exists()) {
+        teamMembers = docSnap.data().teamMembers;
+    }
     teamMembers.push({ name, skills, needs, portfolio, contact });
-    populateTeamTable();
-    saveToLocalStorage();
+
+    await setDoc(docRef, { teamMembers });
+    loadTeamMembers();
     showAlert('Member added successfully!');
 }
 
-function searchUsers() {
+async function searchUsers() {
     const query = document.getElementById("search-bar").value.toLowerCase();
     const filteredMembers = teamMembers.filter(member =>
         member.skills.toLowerCase().includes(query) ||
@@ -397,7 +365,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Task Management
 
-function populateTaskList() {
+async function populateTaskList() {
     taskList.innerHTML = ""; // Clear existing tasks
     tasks.forEach((task, index) => {
         const taskItem = document.createElement("li");
@@ -423,11 +391,10 @@ function addTask() {
 
     tasks.push({ title, description, requester, contact, completed: false });
     populateTaskList();
-    saveToLocalStorage();
     showAlert('Task added successfully!');
 }
 
-function editTask(index) {
+async function editTask(index) {
     const taskItem = taskList.children[index];
     taskItem.querySelector('h3').contentEditable = "true";
     taskItem.querySelector('p').contentEditable = "true";
@@ -435,7 +402,7 @@ function editTask(index) {
     taskItem.querySelector('button[onclick^="saveTask"]').style.display = "inline";
 }
 
-function saveTask(index) {
+async function saveTask(index) {
     const taskItem = taskList.children[index];
     const title = taskItem.querySelector('h3').innerText;
     const description = taskItem.querySelector('p').innerText;
@@ -448,22 +415,19 @@ function saveTask(index) {
     taskItem.querySelector('p').contentEditable = "false";
     taskItem.querySelector('button[onclick^="editTask"]').style.display = "inline";
     taskItem.querySelector('button[onclick^="saveTask"]').style.display = "none";
-    saveToLocalStorage();
     showAlert('Task saved successfully!');
 }
 
-function markCollabCompleted(index) {
+async function markCollabCompleted(index) {
     collabProjects[index].completed = true;
     populateCollabList();
     populateCompletedCollabList();
-    saveToLocalStorage();
     showAlert('Collaboration project marked as completed!');
 }
 
-function deleteTask(index) {
+async function deleteTask(index) {
     tasks.splice(index, 1);
     populateTaskList();
-    saveToLocalStorage();
     showAlert('Task deleted successfully!', 'danger');
 }
 
@@ -476,7 +440,7 @@ document.getElementById('add-task-form').addEventListener('submit', (e) => {
 
 // Collab Projects Management
 
-function populateCollabList() {
+async function populateCollabList() {
     collabList.innerHTML = ""; // Clear existing projects
     collabProjects.forEach((project, index) => {
         if (!project.completed) {
@@ -511,27 +475,25 @@ function populateCollabList() {
     });
 }
 
-function signUpForPosition(projectIndex, positionIndex) {
+async function signUpForPosition(projectIndex, positionIndex) {
     const memberName = prompt("Enter your name to sign up for this position:");
     if (memberName) {
         collabProjects[projectIndex].positions[positionIndex].member = memberName;
         populateCollabList();
-        saveToLocalStorage();
         showAlert('Signed up for position successfully!');
 }
 
-function addCollab() {
+async function addCollab() {
     const title = document.getElementById('collab-title').value;
     const description = document.getElementById('collab-description').value;
     const positions = document.getElementById('collab-positions').value.split(',').map(pos => ({ name: pos.trim(), member: null }));
 
     collabProjects.push({ title, description, positions, steps: [], progress: 0 });
     populateCollabList();
-    saveToLocalStorage();
     showAlert('Collaboration project added successfully!');
 }
 
-function editCollab(index) {
+async function editCollab(index) {
     const projectItem = collabList.children[index];
     projectItem.querySelector('h3').contentEditable = "true";
     projectItem.querySelector('p').contentEditable = "true";
@@ -539,7 +501,7 @@ function editCollab(index) {
     projectItem.querySelector('button[onclick^="saveCollab"]').style.display = "inline";
 }
 
-function saveCollab(index) {
+async function saveCollab(index) {
     const projectItem = collabList.children[index];
     const title = projectItem.querySelector('h3').innerText;
     const description = projectItem.querySelector('p').innerText;
@@ -551,42 +513,38 @@ function saveCollab(index) {
     projectItem.querySelector('p').contentEditable = "false";
     projectItem.querySelector('button[onclick^="editCollab"]').style.display = "inline";
     projectItem.querySelector('button[onclick^="saveCollab"]').style.display = "none";
-    saveToLocalStorage();
     showAlert('Collaboration project saved successfully!');
 }
 
-function deleteCollab(index) {
+async function deleteCollab(index) {
     collabProjects.splice(index, 1);
     populateCollabList();
-    saveToLocalStorage();
     showAlert('Collaboration project deleted successfully!', 'danger');
 }
 
-function toggleStep(projectIndex, stepIndex) {
+async function toggleStep(projectIndex, stepIndex) {
     collabProjects[projectIndex].steps[stepIndex].completed = !collabProjects[projectIndex].steps[stepIndex].completed;
     updateProgress(projectIndex);
     populateCollabList();
-    saveToLocalStorage();
     showAlert('Step status updated!');
 }
 
-function updateProgress(projectIndex) {
+async function updateProgress(projectIndex) {
     const project = collabProjects[projectIndex];
     const completedSteps = project.steps.filter(step => step.completed).length;
     project.progress = (completedSteps / project.steps.length) * 100;
 }
 
-function signUpForPosition(projectIndex, positionIndex) {
+async function signUpForPosition(projectIndex, positionIndex) {
     const memberName = prompt("Enter your name to sign up for this position:");
     if (memberName) {
         collabProjects[projectIndex].positions[positionIndex].member = memberName;
         populateCollabList();
-        saveToLocalStorage();
         showAlert('Signed up for position successfully!');
     }
 }
 
-function editPosition(projectIndex, positionIndex) {
+async function editPosition(projectIndex, positionIndex) {
     const projectItem = collabList.children[projectIndex];
     const positionSpan = projectItem.querySelectorAll('span')[positionIndex];
     positionSpan.contentEditable = "true";
@@ -594,7 +552,7 @@ function editPosition(projectIndex, positionIndex) {
     projectItem.querySelectorAll('button[onclick^="savePosition"]')[positionIndex].style.display = "inline";
 }
 
-function savePosition(projectIndex, positionIndex) {
+async function savePosition(projectIndex, positionIndex) {
     const projectItem = collabList.children[projectIndex];
     const positionSpan = projectItem.querySelectorAll('span')[positionIndex];
     const positionName = positionSpan.innerText.split(' (')[0]; // Remove any assigned member text
@@ -603,19 +561,17 @@ function savePosition(projectIndex, positionIndex) {
     positionSpan.contentEditable = "false";
     projectItem.querySelectorAll('button[onclick^="editPosition"]')[positionIndex].style.display = "inline";
     projectItem.querySelectorAll('button[onclick^="savePosition"]')[positionIndex].style.display = "none";
-    saveToLocalStorage();
     showAlert('Position saved successfully!');
 }
 
-function markCollabCompleted(index) {
+async function markCollabCompleted(index) {
     collabProjects[index].completed = true;
     populateCollabList();
     populateCompletedCollabList();
-    saveToLocalStorage();
     showAlert('Collaboration project marked as completed!');
 }
 
-function populateCompletedCollabList() {
+async function populateCompletedCollabList() {
     const completedCollabList = document.getElementById("completed-collab-list");
     completedCollabList.innerHTML = ""; // Clear existing projects
     collabProjects.forEach((project, index) => {
