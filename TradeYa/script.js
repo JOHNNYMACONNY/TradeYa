@@ -37,30 +37,33 @@ async function fetchData(collectionName) {
         const docRef = doc(db, collectionName, 'data');
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            return docSnap.data().teamMembers;
+            return docSnap.data();
         } else {
             console.log("No such document!");
-            return [];
+            return {};
         }
     } catch (error) {
         console.error('Error fetching data: ', error);
-        return [];
+        return {};
     }
 }
 
 // Load Data
 async function loadTeamMembers() {
-    const teamMembers = await fetchData('teamMembers');
+    const data = await fetchData('teamMembers');
+    const teamMembers = data.teamMembers || [];
     populateTeamTable(teamMembers);
 }
 
 async function loadTasks() {
-    const tasks = await fetchData('tasks');
+    const data = await fetchData('tasks');
+    const tasks = data.tasks || [];
     populateTaskList(tasks);
 }
 
 async function loadCollabProjects() {
-    const collabProjects = await fetchData('collabProjects');
+    const data = await fetchData('collabProjects');
+    const collabProjects = data.collabProjects || [];
     populateCollabList(collabProjects);
     populateCompletedCollabList(collabProjects);
 }
@@ -113,17 +116,38 @@ function populateCollabList(collabProjects) {
     const collabList = document.getElementById("collab-list");
     collabList.innerHTML = ""; // Clear existing projects
     collabProjects.forEach((project, index) => {
+        const positions = Array.isArray(project.positions) ? project.positions.map(pos => pos.name).join(', ') : 'N/A';
         const projectItem = document.createElement("li");
         projectItem.className = "list-group-item";
         projectItem.innerHTML = `
             <h3>${project.title}</h3>
             <p>${project.description}</p>
-            <p>Positions Needed: ${project.positions.map(pos => pos.name).join(', ')}</p>
+            <p>Positions Needed: ${positions}</p>
             <button onclick="editCollab(${index})">Edit</button>
             <button onclick="saveCollab(${index})" style="display:none;">Save</button>
             <button onclick="deleteCollab(${index})">Delete</button>
         `;
         collabList.appendChild(projectItem);
+    });
+}
+
+// Populate Completed Collaboration Projects List
+function populateCompletedCollabList(collabProjects) {
+    const completedCollabList = document.getElementById("completed-collab-list");
+    completedCollabList.innerHTML = ""; // Clear existing projects
+    collabProjects.filter(project => project.completed).forEach((project, index) => {
+        const positions = Array.isArray(project.positions) ? project.positions.map(pos => pos.name).join(', ') : 'N/A';
+        const projectItem = document.createElement("li");
+        projectItem.className = "list-group-item";
+        projectItem.innerHTML = `
+            <h3>${project.title}</h3>
+            <p>${project.description}</p>
+            <p>Positions Needed: ${positions}</p>
+            <button onclick="editCollab(${index})">Edit</button>
+            <button onclick="saveCollab(${index})" style="display:none;">Save</button>
+            <button onclick="deleteCollab(${index})">Delete</button>
+        `;
+        completedCollabList.appendChild(projectItem);
     });
 }
 
@@ -173,6 +197,38 @@ async function addCollabProject(project) {
         loadCollabProjects();
     } catch (error) {
         console.error('Error adding collaboration project: ', error);
+    }
+}
+
+// Delete Team Member
+async function deleteMember(index) {
+    try {
+        const docRef = doc(db, 'teamMembers', 'data');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            let teamMembers = docSnap.data().teamMembers;
+            teamMembers.splice(index, 1);
+            await setDoc(docRef, { teamMembers });
+            loadTeamMembers();
+        }
+    } catch (error) {
+        console.error('Error deleting team member: ', error);
+    }
+}
+
+// Delete Collaboration Project
+async function deleteCollab(index) {
+    try {
+        const docRef = doc(db, 'collabProjects', 'data');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            let collabProjects = docSnap.data().collabProjects;
+            collabProjects.splice(index, 1);
+            await setDoc(docRef, { collabProjects });
+            loadCollabProjects();
+        }
+    } catch (error) {
+        console.error('Error deleting collaboration project: ', error);
     }
 }
 
