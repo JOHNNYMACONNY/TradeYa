@@ -83,6 +83,45 @@
             });
         }
 
+        // Populate Task List
+        function populateTaskList(tasks) {
+            const taskList = document.getElementById("task-list");
+            taskList.innerHTML = ""; // Clear existing tasks
+            tasks.forEach((task, index) => {
+                const taskItem = document.createElement("li");
+                taskItem.className = "list-group-item";
+                taskItem.innerHTML = `
+                    <h3>${task.title}</h3>
+                    <p>${task.description}</p>
+                    <p>Requested by: ${task.requester}</p>
+                    <p>Contact: ${task.contact}</p>
+                    <button onclick="editTask(${index})">Edit</button>
+                    <button onclick="saveTask(${index})" style="display:none;">Save</button>
+                    <button onclick="deleteTask(${index})">Delete</button>
+                `;
+                taskList.appendChild(taskItem);
+            });
+        }
+
+        // Populate Collaboration Projects List
+        function populateCollabList(collabProjects) {
+            const collabList = document.getElementById("collab-list");
+            collabList.innerHTML = ""; // Clear existing projects
+            collabProjects.forEach((project, index) => {
+                const projectItem = document.createElement("li");
+                projectItem.className = "list-group-item";
+                projectItem.innerHTML = `
+                    <h3>${project.title}</h3>
+                    <p>${project.description}</p>
+                    <p>Positions Needed: ${project.positions.map(pos => pos.name).join(', ')}</p>
+                    <button onclick="editCollab(${index})">Edit</button>
+                    <button onclick="saveCollab(${index})" style="display:none;">Save</button>
+                    <button onclick="deleteCollab(${index})">Delete</button>
+                `;
+                collabList.appendChild(projectItem);
+            });
+        }
+
         // Add Data to Firestore
         async function addTeamMember(member) {
             try {
