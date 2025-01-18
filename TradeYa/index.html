@@ -111,12 +111,13 @@
             const collabList = document.getElementById("collab-list");
             collabList.innerHTML = ""; // Clear existing projects
             collabProjects.forEach((project, index) => {
+                const positions = Array.isArray(project.positions) ? project.positions.map(pos => pos.name).join(', ') : 'N/A';
                 const projectItem = document.createElement("li");
                 projectItem.className = "list-group-item";
                 projectItem.innerHTML = `
                     <h3>${project.title}</h3>
                     <p>${project.description}</p>
-                    <p>Positions Needed: ${project.positions.map(pos => pos.name).join(', ')}</p>
+                    <p>Positions Needed: ${positions}</p>
                     <button onclick="editCollab(${index})">Edit</button>
                     <button onclick="saveCollab(${index})" style="display:none;">Save</button>
                     <button onclick="deleteCollab(${index})">Delete</button>
