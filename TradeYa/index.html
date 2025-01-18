@@ -32,30 +32,33 @@
                 const docRef = doc(db, collectionName, 'data');
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
-                    return docSnap.data().teamMembers;
+                    return docSnap.data();
                 } else {
                     console.log("No such document!");
-                    return [];
+                    return {};
                 }
             } catch (error) {
                 console.error('Error fetching data: ', error);
-                return [];
+                return {};
             }
         }
 
         // Load Data
         async function loadTeamMembers() {
-            const teamMembers = await fetchData('teamMembers');
+            const data = await fetchData('teamMembers');
+            const teamMembers = data.teamMembers || [];
             populateTeamTable(teamMembers);
         }
 
         async function loadTasks() {
-            const tasks = await fetchData('tasks');
+            const data = await fetchData('tasks');
+            const tasks = data.tasks || [];
             populateTaskList(tasks);
         }
 
         async function loadCollabProjects() {
-            const collabProjects = await fetchData('collabProjects');
+            const data = await fetchData('collabProjects');
+            const collabProjects = data.collabProjects || [];
             populateCollabList(collabProjects);
             populateCompletedCollabList(collabProjects);
         }
