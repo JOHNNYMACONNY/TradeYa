@@ -31,20 +31,6 @@ const initialTeamMembers = [
     { name: "Thalita", skills: "Styling, Marketing Strategy", needs: "Portfolio Shoots", portfolio: "#", contact: "thalita@example.com" }
 ];
 
-// Function to save initial data to Firestore
-async function saveInitialData() {
-    try {
-        const docRef = doc(db, 'teamMembers', 'data');
-        await setDoc(docRef, { teamMembers: initialTeamMembers });
-        console.log('Initial team members data saved to Firestore');
-    } catch (error) {
-        console.error('Error saving initial data: ', error);
-    }
-}
-
-// Call this function once to save the initial data
-saveInitialData();
-
 // Fetch Data from Firestore
 async function fetchData(collectionName) {
     try {
@@ -195,53 +181,50 @@ document.getElementById('add-collab-form').addEventListener('submit', async (e) 
     await addCollabProject(project);
 });
 
-document.getElementById('add-task-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const task = {
-        title: document.getElementById('task-title').value,
-        description: document.getElementById('task-description').value,
-        requester: document.getElementById('task-requester').value,
-        contact: document.getElementById('task-contact').value,
-        completed: false
-    };
-    await addTask(task);
-});
+// Define searchUsers function
+async function searchUsers() {
+    const query = document.getElementById("search-bar").value.toLowerCase();
+    const docRef = doc(db, 'teamMembers', 'data');
+    const docSnap = await getDoc(docRef);
+    let teamMembers = [];
+    if (docSnap.exists()) {
+        teamMembers = docSnap.data().teamMembers;
+    }
+    const filteredMembers = teamMembers.filter(member =>
+        member.skills.toLowerCase().includes(query) ||
+        member.needs.toLowerCase().includes(query) ||
+        member.name.toLowerCase().includes(query)
+    );
 
-document.getElementById('add-collab-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const project = {
-        title: document.getElementById('collab-title').value,
-        description: document.getElementById('collab-description').value,
-        positions: document.getElementById('collab-positions').value.split(',').map(pos => ({ name: pos.trim(), member: null })),
-        steps: [],
-        progress: 0,
-        completed: false
-    };
-    await addCollabProject(project);
-});
-
-const teamList = document.getElementById("team-list");
-const taskList = document.getElementById("task-list");
-const collabList = document.getElementById("collab-list");
+    const teamList = document.getElementById("team-list");
+    teamList.innerHTML = ""; // Clear existing rows
+    filteredMembers.forEach((member, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td contenteditable="false">${member.name}</td>
+            <td contenteditable="false">${member.skills}</td>
+            <td contenteditable="false">${member.needs}</td>
+            <td contenteditable="false"><a href="${member.portfolio}" target="_blank">${member.portfolio}</a></td>
+            <td contenteditable="false">${member.contact}</td>
+            <td>
+                <button onclick="contactMember('${member.contact}')">Contact</button>
+                <button onclick="editMember(${index})">Edit</button>
+                <button onclick="saveMember(${index})" style="display:none;">Save</button>
+                <button onclick="deleteMember(${index})">Delete</button>
+            </td>
+        `;
+        teamList.appendChild(row);
+    });
+}
 
 // User feedback function
-async function showAlert(message, type = 'success') {
+function showAlert(message, type = 'success') {
     const alert = document.createElement('div');
-    alert.className = `alert alert-${type} alert-dismissible fade show`;
-    alert.role = 'alert';
-    alert.innerHTML = `
-        <strong>${type === 'success' ? 'Success!' : 'Error!'}</strong> ${message}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    `;
+    alert.className = `alert alert-${type}`;
+    alert.textContent = message;
     document.body.appendChild(alert);
     setTimeout(() => {
-        alert.classList.remove('show');
-        alert.classList.add('hide');
-        setTimeout(() => {
-            alert.remove();
-        }, 500);
+        alert.remove();
     }, 3000);
 }
 
