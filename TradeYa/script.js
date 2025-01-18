@@ -33,9 +33,13 @@ const initialTeamMembers = [
 
 // Function to save initial data to Firestore
 async function saveInitialData() {
-    const docRef = doc(db, 'teamMembers', 'data');
-    await setDoc(docRef, { teamMembers: initialTeamMembers });
-    console.log('Initial team members data saved to Firestore');
+    try {
+        const docRef = doc(db, 'teamMembers', 'data');
+        await setDoc(docRef, { teamMembers: initialTeamMembers });
+        console.log('Initial team members data saved to Firestore');
+    } catch (error) {
+        console.error('Error saving initial data: ', error);
+    }
 }
 
 // Call this function once to save the initial data
@@ -43,12 +47,17 @@ saveInitialData();
 
 // Fetch Data from Firestore
 async function fetchData(collectionName) {
-    const docRef = doc(db, collectionName, 'data');
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-        return docSnap.data().teamMembers;
-    } else {
-        console.log("No such document!");
+    try {
+        const docRef = doc(db, collectionName, 'data');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return docSnap.data().teamMembers;
+        } else {
+            console.log("No such document!");
+            return [];
+        }
+    } catch (error) {
+        console.error('Error fetching data: ', error);
         return [];
     }
 }
@@ -95,39 +104,51 @@ function populateTeamTable(teamMembers) {
 
 // Add Data to Firestore
 async function addTeamMember(member) {
-    const docRef = doc(db, 'teamMembers', 'data');
-    const docSnap = await getDoc(docRef);
-    let teamMembers = [];
-    if (docSnap.exists()) {
-        teamMembers = docSnap.data().teamMembers;
+    try {
+        const docRef = doc(db, 'teamMembers', 'data');
+        const docSnap = await getDoc(docRef);
+        let teamMembers = [];
+        if (docSnap.exists()) {
+            teamMembers = docSnap.data().teamMembers;
+        }
+        teamMembers.push(member);
+        await setDoc(docRef, { teamMembers });
+        loadTeamMembers();
+    } catch (error) {
+        console.error('Error adding team member: ', error);
     }
-    teamMembers.push(member);
-    await setDoc(docRef, { teamMembers });
-    loadTeamMembers();
 }
 
 async function addTask(task) {
-    const docRef = doc(db, 'tasks', 'data');
-    const docSnap = await getDoc(docRef);
-    let tasks = [];
-    if (docSnap.exists()) {
-        tasks = docSnap.data().tasks;
+    try {
+        const docRef = doc(db, 'tasks', 'data');
+        const docSnap = await getDoc(docRef);
+        let tasks = [];
+        if (docSnap.exists()) {
+            tasks = docSnap.data().tasks;
+        }
+        tasks.push(task);
+        await setDoc(docRef, { tasks });
+        loadTasks();
+    } catch (error) {
+        console.error('Error adding task: ', error);
     }
-    tasks.push(task);
-    await setDoc(docRef, { tasks });
-    loadTasks();
 }
 
 async function addCollabProject(project) {
-    const docRef = doc(db, 'collabProjects', 'data');
-    const docSnap = await getDoc(docRef);
-    let collabProjects = [];
-    if (docSnap.exists()) {
-        collabProjects = docSnap.data().collabProjects;
+    try {
+        const docRef = doc(db, 'collabProjects', 'data');
+        const docSnap = await getDoc(docRef);
+        let collabProjects = [];
+        if (docSnap.exists()) {
+            collabProjects = docSnap.data().collabProjects;
+        }
+        collabProjects.push(project);
+        await setDoc(docRef, { collabProjects });
+        loadCollabProjects();
+    } catch (error) {
+        console.error('Error adding collaboration project: ', error);
     }
-    collabProjects.push(project);
-    await setDoc(docRef, { collabProjects });
-    loadCollabProjects();
 }
 
 // Event Listeners
@@ -147,6 +168,31 @@ document.getElementById('add-member-form').addEventListener('submit', async (e) 
         contact: document.getElementById('new-contact').value
     };
     await addTeamMember(member);
+});
+
+document.getElementById('add-task-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const task = {
+        title: document.getElementById('task-title').value,
+        description: document.getElementById('task-description').value,
+        requester: document.getElementById('task-requester').value,
+        contact: document.getElementById('task-contact').value,
+        completed: false
+    };
+    await addTask(task);
+});
+
+document.getElementById('add-collab-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const project = {
+        title: document.getElementById('collab-title').value,
+        description: document.getElementById('collab-description').value,
+        positions: document.getElementById('collab-positions').value.split(',').map(pos => ({ name: pos.trim(), member: null })),
+        steps: [],
+        progress: 0,
+        completed: false
+    };
+    await addCollabProject(project);
 });
 
 document.getElementById('add-task-form').addEventListener('submit', async (e) => {
