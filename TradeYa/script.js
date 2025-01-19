@@ -20,7 +20,7 @@ const db = getFirestore(app);
 async function fetchData(TradeYa) {
     try {
         const docRef = doc(db, TradeYa, 'data');
-        const docSnap = await getDoc(docRef);
+       const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             return docSnap.data();
         } else {
@@ -30,6 +30,31 @@ async function fetchData(TradeYa) {
     } catch (error) {
         console.error('Error fetching data: ', error);
         return {};
+    }
+}
+
+async function saveMember(index) {
+    const memberRow = document.querySelector(`#member-row-${index}`);
+    const cells = memberRow.querySelectorAll('td');
+    const updatedMember = {
+        name: cells[0].innerText,
+        skills: cells[1].innerText,
+        needs: cells[2].innerText,
+        portfolio: cells[3].querySelector('a').href,
+        contact: cells[4].innerText
+    };
+
+    try {
+        const docRef = doc(db, 'teamMembers', 'data');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            let teamMembers = docSnap.data().teamMembers;
+            teamMembers[index] = updatedMember;
+            await setDoc(docRef, { teamMembers });
+            loadTeamMembers();
+        }
+    } catch (error) {
+        console.error('Error saving team member: ', error);
     }
 }
 
