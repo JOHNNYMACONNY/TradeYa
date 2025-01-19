@@ -16,6 +16,21 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// Initial team members data
+const initialTeamMembers = [
+    { name: "Adrian", skills: "Logistics, Performing Music", needs: "Promotion, Event Coordination", portfolio: "#", contact: "adrian@example.com" },
+    { name: "Izzy", skills: "Clothing Brand, Merch", needs: "Graphic Design", portfolio: "#", contact: "izzy@example.com" },
+    { name: "TLOK", skills: "Engineering, Producing, Audio Edit", needs: "Mixing Mastering", portfolio: "#", contact: "tlok@example.com" },
+    { name: "RJ", skills: "Setup, House Engineer, DJ", needs: "Event Planning", portfolio: "#", contact: "rj@example.com" },
+    { name: "Johnny Maconny", skills: "Audio Engineering, Podcast Editing", needs: "Web Development", portfolio: "#", contact: "johnny@example.com" },
+    { name: "Benny", skills: "Filming, Editing, Radio Connections", needs: "Collaborative Projects", portfolio: "#", contact: "benny@example.com" },
+    { name: "Jaylon", skills: "Beatmaking, Admin, Promo", needs: "Marketing Assistance", portfolio: "#", contact: "jaylon@example.com" },
+    { name: "Greg", skills: "Music Production, Instrumentalist", needs: "Studio Space", portfolio: "#", contact: "greg@example.com" },
+    { name: "Juan", skills: "Accounting, Brand Development", needs: "Music Marketing", portfolio: "#", contact: "juan@example.com" },
+    { name: "Mike", skills: "Songwriting, Vlog Editing", needs: "Distribution Channels", portfolio: "#", contact: "mike@example.com" },
+    { name: "Thalita", skills: "Styling, Marketing Strategy", needs: "Portfolio Shoots", portfolio: "#", contact: "thalita@example.com" }
+];
+
 // Fetch Data from Firestore
 async function fetchData(collectionName) {
     try {
@@ -54,10 +69,11 @@ function populateCompletedCollabList(collabProjects) {
 }
 
 // Load Data
-async function loadTeamMembers() {
-    const data = await fetchData('teamMembers');
-    const teamMembers = data.teamMembers || [];
-    populateTeamTable(teamMembers);
+async function loadCollabProjects() {
+    const data = await fetchData('collabProjects');
+    const collabProjects = data.collabProjects || [];
+    populateCollabList(collabProjects);
+    populateCompletedCollabList(collabProjects);
 }
 
 async function loadTasks() {
@@ -237,7 +253,7 @@ async function addCollabProject(project) {
         const docRef = doc(db, 'collabProjects', 'data');
         const docSnap = await getDoc(docRef);
         let collabProjects = [];
-        if (docSnap exists()) {
+        if (docSnap.exists()) { // Corrected line
             collabProjects = docSnap.data().collabProjects;
         }
         collabProjects.push(project);
