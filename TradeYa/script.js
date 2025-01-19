@@ -89,11 +89,12 @@ async function loadCollabProjects() {
 }
 
 // Populate Team Members
-function populateTeamTable(teamMembers) {
+async function populateTeamTable(teamMembers) {
     const teamList = document.getElementById("team-list");
     teamList.innerHTML = ""; // Clear existing rows
     teamMembers.forEach((member, index) => {
         const row = document.createElement("tr");
+        row.id = `member-row-${index}`; // Assign ID to row
         row.innerHTML = `
             <td contenteditable="false">${member.name}</td>
             <td contenteditable="false">${member.skills}</td>
@@ -138,11 +139,12 @@ async function saveMember(index) {
 }
 
 // Populate Task List
-function populateTaskList(tasks) {
-    const taskList = document.getElementById("task-list");
+async function populateTaskList(tasks) {
+   const taskList = document.getElementById("task-list");
     taskList.innerHTML = ""; // Clear existing tasks
     tasks.forEach((task, index) => {
         const taskItem = document.createElement("li");
+        taskItem.id = `task-row-${index}`; // Assign ID to row
         taskItem.className = "list-group-item";
         taskItem.innerHTML = `
             <h3>${task.title}</h3>
@@ -158,7 +160,7 @@ function populateTaskList(tasks) {
 }
 
 // Edit task 
-function editTask(index) {
+async function editTask(index) {
     const taskRow = document.querySelector(`#task-row-${index}`);
     const cells = taskRow.querySelectorAll('td');
     cells.forEach(cell => cell.contentEditable = true);
@@ -183,7 +185,7 @@ async function deleteTask(index) {
 }
 
 // Edit collab
-function editCollab(index) {
+async function editCollab(index) {
     const collabRow = document.querySelector(`#collab-row-${index}`);
     const cells = collabRow.querySelectorAll('td');
     cells.forEach(cell => cell.contentEditable = true);
@@ -377,7 +379,7 @@ async function searchUsers() {
 }
 
 // User feedback function
-function showAlert(message, type = 'success') {
+async function showAlert(message, type = 'success') {
     const alert = document.createElement('div');
     alert.className = `alert alert-${type}`;
     alert.textContent = message;
