@@ -91,6 +91,31 @@ function populateTeamTable(teamMembers) {
     });
 }
 
+// save member
+async function saveMember(index) {
+    const memberRow = document.querySelector(`#member-row-${index}`);
+    const cells = memberRow.querySelectorAll('td');
+    const updatedMember = {
+        name: cells[0].innerText,
+        skills: cells[1].innerText,
+        needs: cells[2].innerText,
+        portfolio: cells[3].querySelector('a').href,
+        contact: cells[4].innerText
+    };
+
+    try {
+        const docRef = doc(db, 'teamMembers', 'data');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            let teamMembers = docSnap.data().teamMembers;
+            teamMembers[index] = updatedMember;
+            await setDoc(docRef, { teamMembers });
+            loadTeamMembers();
+        }
+    } catch (error) {
+        console.error('Error saving team member: ', error);
+    }
+}
 // Populate Task List
 function populateTaskList(tasks) {
     const taskList = document.getElementById("task-list");
@@ -109,6 +134,33 @@ function populateTaskList(tasks) {
         `;
         taskList.appendChild(taskItem);
     });
+}
+
+// edit task 
+function editTask(index) {
+    const taskRow = document.querySelector(`#task-row-${index}`);
+    const cells = taskRow.querySelectorAll('td');
+    cells.forEach(cell => cell.contentEditable = true);
+    taskRow.querySelector('.save-button').style.display = 'inline';
+    taskRow.querySelector('.edit-button').style.display = 'none';
+}
+
+
+
+// Function to delete a task
+async function deleteTask(index) {
+    try {
+        const docRef = doc(db, 'tasks', 'data');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            let tasks = docSnap.data().tasks;
+            tasks.splice(index, 1);
+            await setDoc(docRef, { tasks });
+            loadTasks();
+        }
+    } catch (error) {
+        console.error('Error deleting task: ', error);
+    }
 }
 
 // Populate Collaboration Projects List
@@ -131,24 +183,38 @@ function populateCollabList(collabProjects) {
     });
 }
 
-// Populate Completed Collaboration Projects List
-function populateCompletedCollabList(collabProjects) {
-    const completedCollabList = document.getElementById("completed-collab-list");
-    completedCollabList.innerHTML = ""; // Clear existing projects
-    collabProjects.filter(project => project.completed).forEach((project, index) => {
-        const positions = Array.isArray(project.positions) ? project.positions.map(pos => pos.name).join(', ') : 'N/A';
-        const projectItem = document.createElement("li");
-        projectItem.className = "list-group-item";
-        projectItem.innerHTML = `
-            <h3>${project.title}</h3>
-            <p>${project.description}</p>
-            <p>Positions Needed: ${positions}</p>
-            <button onclick="editCollab(${index})">Edit</button>
-            <button onclick="saveCollab(${index})" style="display:none;">Save</button>
-            <button onclick="deleteCollab(${index})">Delete</button>
-        `;
-        completedCollabList.appendChild(projectItem);
-    });
+// edit collab
+
+function editCollab(index) {
+    const collabRow = document.querySelector(`#collab-row-${index}`);
+    const cells = collabRow.querySelectorAll('td');
+    cells.forEach(cell => cell.contentEditable = true);
+    collabRow.querySelector('.save-button').style.display = 'inline';
+    collabRow.querySelector('.edit-button').style.display = 'none';
+}
+
+//save collab
+async function saveCollab(index) {
+    const collabRow = document.querySelector(`#collab-row-${index}`);
+    const cells = collabRow.querySelectorAll('td');
+    const updatedCollab = {
+        title: cells[0].innerText,
+        description: cells[1].innerText,
+        positions: cells[2].innerText.split(',').map(pos => ({ name: pos.trim() }))
+    };
+
+    try {
+        const docRef = doc(db, 'collabProjects', 'data');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            let collabProjects = docSnap.data().collabProjects;
+            collabProjects[index] = updatedCollab;
+            await setDoc(docRef, { collabProjects });
+            loadCollabProjects();
+        }
+    } catch (error) {
+        console.error('Error saving collaboration project: ', error);
+    }
 }
 
 // Add Data to Firestore
@@ -200,7 +266,7 @@ async function addCollabProject(project) {
     }
 }
 
-// Delete Team Member
+// Function to delete a member
 async function deleteMember(index) {
     try {
         const docRef = doc(db, 'teamMembers', 'data');
