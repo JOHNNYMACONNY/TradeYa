@@ -17,9 +17,9 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // Fetch Data from Firestore
-async function fetchData(collectionName) {
+async function fetchData(TradeYa) {
     try {
-        const docRef = doc(db, collectionName, 'data');
+        const docRef = doc(db, TradeYa, 'data');
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             return docSnap.data();
