@@ -16,21 +16,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Initial team members data
-const initialTeamMembers = [
-    { name: "Adrian", skills: "Logistics, Performing Music", needs: "Promotion, Event Coordination", portfolio: "#", contact: "adrian@example.com" },
-    { name: "Izzy", skills: "Clothing Brand, Merch", needs: "Graphic Design", portfolio: "#", contact: "izzy@example.com" },
-    { name: "TLOK", skills: "Engineering, Producing, Audio Edit", needs: "Mixing Mastering", portfolio: "#", contact: "tlok@example.com" },
-    { name: "RJ", skills: "Setup, House Engineer, DJ", needs: "Event Planning", portfolio: "#", contact: "rj@example.com" },
-    { name: "Johnny Maconny", skills: "Audio Engineering, Podcast Editing", needs: "Web Development", portfolio: "#", contact: "johnny@example.com" },
-    { name: "Benny", skills: "Filming, Editing, Radio Connections", needs: "Collaborative Projects", portfolio: "#", contact: "benny@example.com" },
-    { name: "Jaylon", skills: "Beatmaking, Admin, Promo", needs: "Marketing Assistance", portfolio: "#", contact: "jaylon@example.com" },
-    { name: "Greg", skills: "Music Production, Instrumentalist", needs: "Studio Space", portfolio: "#", contact: "greg@example.com" },
-    { name: "Juan", skills: "Accounting, Brand Development", needs: "Music Marketing", portfolio: "#", contact: "juan@example.com" },
-    { name: "Mike", skills: "Songwriting, Vlog Editing", needs: "Distribution Channels", portfolio: "#", contact: "mike@example.com" },
-    { name: "Thalita", skills: "Styling, Marketing Strategy", needs: "Portfolio Shoots", portfolio: "#", contact: "thalita@example.com" }
-];
-
 // Fetch Data from Firestore
 async function fetchData(collectionName) {
     try {
@@ -69,11 +54,10 @@ function populateCompletedCollabList(collabProjects) {
 }
 
 // Load Data
-async function loadCollabProjects() {
-    const data = await fetchData('collabProjects');
-    const collabProjects = data.collabProjects || [];
-    populateCollabList(collabProjects);
-    populateCompletedCollabList(collabProjects);
+async function loadTeamMembers() {
+    const data = await fetchData('teamMembers');
+    const teamMembers = data.teamMembers || [];
+    populateTeamTable(teamMembers);
 }
 
 async function loadTasks() {
@@ -112,7 +96,7 @@ function populateTeamTable(teamMembers) {
     });
 }
 
-// save member
+// Save member
 async function saveMember(index) {
     const memberRow = document.querySelector(`#member-row-${index}`);
     const cells = memberRow.querySelectorAll('td');
@@ -137,6 +121,7 @@ async function saveMember(index) {
         console.error('Error saving team member: ', error);
     }
 }
+
 // Populate Task List
 function populateTaskList(tasks) {
     const taskList = document.getElementById("task-list");
@@ -157,7 +142,7 @@ function populateTaskList(tasks) {
     });
 }
 
-// edit task 
+// Edit task 
 function editTask(index) {
     const taskRow = document.querySelector(`#task-row-${index}`);
     const cells = taskRow.querySelectorAll('td');
@@ -182,7 +167,7 @@ async function deleteTask(index) {
     }
 }
 
-// edit collab
+// Edit collab
 function editCollab(index) {
     const collabRow = document.querySelector(`#collab-row-${index}`);
     const cells = collabRow.querySelectorAll('td');
@@ -191,7 +176,7 @@ function editCollab(index) {
     collabRow.querySelector('.edit-button').style.display = 'none';
 }
 
-//save collab
+// Save collab
 async function saveCollab(index) {
     const collabRow = document.querySelector(`#collab-row-${index}`);
     const cells = collabRow.querySelectorAll('td');
@@ -253,7 +238,7 @@ async function addCollabProject(project) {
         const docRef = doc(db, 'collabProjects', 'data');
         const docSnap = await getDoc(docRef);
         let collabProjects = [];
-        if (docSnap.exists()) { // Corrected line
+        if (docSnap.exists()) {
             collabProjects = docSnap.data().collabProjects;
         }
         collabProjects.push(project);
