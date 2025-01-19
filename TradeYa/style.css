@@ -2,7 +2,8 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f4f4f4;
+  background-color: #f8f9fa;
+  color: #343a40;
 }
 
 header, footer {
@@ -158,31 +159,24 @@ li {
 }
 
 /* Dark Mode Styles */
-body.dark-mode {
-    background-color: #121212;
-    color: #ffffff;
+.dark-mode {
+  background-color: #343a40;
+  color: #f8f9fa;
 }
 
-header.dark-mode, footer.dark-mode {
-    background-color: #1e1e1e;
+.dark-mode .bg-dark {
+  background-color: #f8f9fa !important;
+  color: #343a40 !important;
 }
 
-table.dark-mode {
-    background-color: #1e1e1e;
-    color: #ffffff;
+.dark-mode .list-group-item {
+  background-color: #495057;
+  color: #f8f9fa;
 }
 
-th.dark-mode, td.dark-mode {
-    border-color: #333333;
-}
-
-button.dark-mode {
-    background-color: #333333;
-    color: #ffffff;
-}
-
-button.dark-mode:hover {
-    background-color: #444444;
+.dark-mode .btn {
+  background-color: #6c757d;
+  color: #f8f9fa;
 }
 
 /* Animations */
