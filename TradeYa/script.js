@@ -48,6 +48,26 @@ async function fetchData(collectionName) {
     }
 }
 
+// Function to populate completed collaboration list
+function populateCompletedCollabList(collabProjects) {
+    const completedCollabList = document.getElementById("completed-collab-list");
+    completedCollabList.innerHTML = ""; // Clear existing projects
+    collabProjects.filter(project => project.completed).forEach((project, index) => {
+        const positions = Array.isArray(project.positions) ? project.positions.map(pos => pos.name).join(', ') : 'N/A';
+        const projectItem = document.createElement("li");
+        projectItem.className = "list-group-item";
+        projectItem.innerHTML = `
+            <h3>${project.title}</h3>
+            <p>${project.description}</p>
+            <p>Positions Needed: ${positions}</p>
+            <button onclick="editCollab(${index})">Edit</button>
+            <button onclick="saveCollab(${index})" style="display:none;">Save</button>
+            <button onclick="deleteCollab(${index})">Delete</button>
+        `;
+        completedCollabList.appendChild(projectItem);
+    });
+}
+
 // Load Data
 async function loadTeamMembers() {
     const data = await fetchData('teamMembers');
@@ -145,8 +165,6 @@ function editTask(index) {
     taskRow.querySelector('.edit-button').style.display = 'none';
 }
 
-
-
 // Function to delete a task
 async function deleteTask(index) {
     try {
@@ -163,28 +181,7 @@ async function deleteTask(index) {
     }
 }
 
-// Populate Collaboration Projects List
-function populateCollabList(collabProjects) {
-    const collabList = document.getElementById("collab-list");
-    collabList.innerHTML = ""; // Clear existing projects
-    collabProjects.forEach((project, index) => {
-        const positions = Array.isArray(project.positions) ? project.positions.map(pos => pos.name).join(', ') : 'N/A';
-        const projectItem = document.createElement("li");
-        projectItem.className = "list-group-item";
-        projectItem.innerHTML = `
-            <h3>${project.title}</h3>
-            <p>${project.description}</p>
-            <p>Positions Needed: ${positions}</p>
-            <button onclick="editCollab(${index})">Edit</button>
-            <button onclick="saveCollab(${index})" style="display:none;">Save</button>
-            <button onclick="deleteCollab(${index})">Delete</button>
-        `;
-        collabList.appendChild(projectItem);
-    });
-}
-
 // edit collab
-
 function editCollab(index) {
     const collabRow = document.querySelector(`#collab-row-${index}`);
     const cells = collabRow.querySelectorAll('td');
