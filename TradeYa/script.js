@@ -1,5 +1,5 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, setDoc, doc, getDoc, addDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getFirestore, collection, getDocs, setDoc, doc, getDoc, addDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -17,10 +17,10 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // Fetch Data from Firestore
-async function fetchData(TradeYa) {
+async function fetchData(collectionName) {
     try {
-        const docRef = doc(db, TradeYa, 'data');
-       const docSnap = await getDoc(docRef);
+        const docRef = doc(db, collectionName, 'data');
+        const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             return docSnap.data();
         } else {
@@ -32,46 +32,6 @@ async function fetchData(TradeYa) {
         return {};
     }
 }
-
-async function saveMember(index) {
-    const memberRow = document.querySelector(`#member-row-${index}`);
-    const cells = memberRow.querySelectorAll('td');
-    const updatedMember = {
-        name: cells[0].innerText,
-        skills: cells[1].innerText,
-        needs: cells[2].innerText,
-        portfolio: cells[3].querySelector('a').href,
-        contact: cells[4].innerText
-    };
-
-    try {
-        const docRef = doc(db, 'teamMembers', 'data');
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            let teamMembers = docSnap.data().teamMembers;
-            teamMembers[index] = updatedMember;
-            await setDoc(docRef, { teamMembers });
-            loadTeamMembers();
-        }
-    } catch (error) {
-        console.error('Error saving team member: ', error);
-    }
-}
-
-// Initial team members data
-const initialTeamMembers = [
-    { name: "Adrian", skills: "Logistics, Performing Music", needs: "Promotion, Event Coordination", portfolio: "#", contact: "adrian@example.com" },
-    { name: "Izzy", skills: "Clothing Brand, Merch", needs: "Graphic Design", portfolio: "#", contact: "izzy@example.com" },
-    { name: "TLOK", skills: "Engineering, Producing, Audio Edit", needs: "Mixing Mastering", portfolio: "#", contact: "tlok@example.com" },
-    { name: "RJ", skills: "Setup, House Engineer, DJ", needs: "Event Planning", portfolio: "#", contact: "rj@example.com" },
-    { name: "Johnny Maconny", skills: "Audio Engineering, Podcast Editing", needs: "Web Development", portfolio: "#", contact: "johnny@example.com" },
-    { name: "Benny", skills: "Filming, Editing, Radio Connections", needs: "Collaborative Projects", portfolio: "#", contact: "benny@example.com" },
-    { name: "Jaylon", skills: "Beatmaking, Admin, Promo", needs: "Marketing Assistance", portfolio: "#", contact: "jaylon@example.com" },
-    { name: "Greg", skills: "Music Production, Instrumentalist", needs: "Studio Space", portfolio: "#", contact: "greg@example.com" },
-    { name: "Juan", skills: "Accounting, Brand Development", needs: "Music Marketing", portfolio: "#", contact: "juan@example.com" },
-    { name: "Mike", skills: "Songwriting, Vlog Editing", needs: "Distribution Channels", portfolio: "#", contact: "mike@example.com" },
-    { name: "Thalita", skills: "Styling, Marketing Strategy", needs: "Portfolio Shoots", portfolio: "#", contact: "thalita@example.com" }
-];
 
 // Function to populate completed collaboration list
 function populateCompletedCollabList(collabProjects) {
@@ -114,12 +74,11 @@ async function loadCollabProjects() {
 }
 
 // Populate Team Members
-async function populateTeamTable(teamMembers) {
+function populateTeamTable(teamMembers) {
     const teamList = document.getElementById("team-list");
     teamList.innerHTML = ""; // Clear existing rows
     teamMembers.forEach((member, index) => {
         const row = document.createElement("tr");
-        row.id = `member-row-${index}`; // Assign ID to row
         row.innerHTML = `
             <td contenteditable="false">${member.name}</td>
             <td contenteditable="false">${member.skills}</td>
@@ -164,12 +123,11 @@ async function saveMember(index) {
 }
 
 // Populate Task List
-async function populateTaskList(tasks) {
-   const taskList = document.getElementById("task-list");
+function populateTaskList(tasks) {
+    const taskList = document.getElementById("task-list");
     taskList.innerHTML = ""; // Clear existing tasks
     tasks.forEach((task, index) => {
         const taskItem = document.createElement("li");
-        taskItem.id = `task-row-${index}`; // Assign ID to row
         taskItem.className = "list-group-item";
         taskItem.innerHTML = `
             <h3>${task.title}</h3>
@@ -185,7 +143,7 @@ async function populateTaskList(tasks) {
 }
 
 // Edit task 
-async function editTask(index) {
+function editTask(index) {
     const taskRow = document.querySelector(`#task-row-${index}`);
     const cells = taskRow.querySelectorAll('td');
     cells.forEach(cell => cell.contentEditable = true);
@@ -210,7 +168,7 @@ async function deleteTask(index) {
 }
 
 // Edit collab
-async function editCollab(index) {
+function editCollab(index) {
     const collabRow = document.querySelector(`#collab-row-${index}`);
     const cells = collabRow.querySelectorAll('td');
     cells.forEach(cell => cell.contentEditable = true);
@@ -323,50 +281,6 @@ async function deleteCollab(index) {
     }
 }
 
-// Event Listeners
-document.addEventListener("DOMContentLoaded", () => {
-    loadTeamMembers();
-    loadTasks();
-    loadCollabProjects();
-});
-
-document.getElementById('add-member-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const member = {
-        name: document.getElementById('new-name').value,
-        skills: document.getElementById('new-skills').value,
-        needs: document.getElementById('new-needs').value,
-        portfolio: document.getElementById('new-portfolio').value,
-        contact: document.getElementById('new-contact').value
-    };
-    await addTeamMember(member);
-});
-
-document.getElementById('add-task-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const task = {
-        title: document.getElementById('task-title').value,
-        description: document.getElementById('task-description').value,
-        requester: document.getElementById('task-requester').value,
-        contact: document.getElementById('task-contact').value,
-        completed: false
-    };
-    await addTask(task);
-});
-
-document.getElementById('add-collab-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const project = {
-        title: document.getElementById('collab-title').value,
-        description: document.getElementById('collab-description').value,
-        positions: document.getElementById('collab-positions').value.split(',').map(pos => ({ name: pos.trim(), member: null })),
-        steps: [],
-        progress: 0,
-        completed: false
-    };
-    await addCollabProject(project);
-});
-
 // Define searchUsers function
 async function searchUsers() {
     const query = document.getElementById("search-bar").value.toLowerCase();
@@ -404,7 +318,7 @@ async function searchUsers() {
 }
 
 // User feedback function
-async function showAlert(message, type = 'success') {
+function showAlert(message, type = 'success') {
     const alert = document.createElement('div');
     alert.className = `alert alert-${type}`;
     alert.textContent = message;
